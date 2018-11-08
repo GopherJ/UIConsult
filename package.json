@@ -21,6 +21,7 @@
         "babel-loader": "^8.0.4",
         "babel-plugin-dynamic-import-webpack": "^1.1.0",
         "babel-preset-env": "^1.7.0",
+        "babel-preset-stage-0": "^6.24.1",
         "chalk": "^2.4.1",
         "ora": "^3.0.0",
         "pkg": "^4.3.4",
