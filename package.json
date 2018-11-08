@@ -1,20 +1,25 @@
 {
-  "name": "UIConsult",
-  "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
-  "scripts": {
-    "build": "babel"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "devDependencies": {
-    "babel-cli": "^6.26.0",
-    "babel-loader": "^8.0.4",
-    "babel-plugin-dynamic-import-webpack": "^1.1.0",
-    "babel-preset-env": "^1.7.0",
-    "pkg": "^4.3.4",
-    "webpack": "^4.25.1"
-  }
+    "name": "uiconsult",
+    "version": "1.0.0",
+    "description": "glo2 project in utt",
+    "main": "index.js",
+    "scripts": {
+    },
+    "keywords": [],
+    "author": "Cheng JIANG",
+    "Contributors": [
+        {
+            "name": "Cheng JIANG",
+            "email": "cocathecafe@gmail.com",
+            "url": "https://github.com/gopherj"
+        }
+    ],
+    "license": "ISC",
+    "devDependencies": {
+        "babel-loader": "^8.0.4",
+        "babel-plugin-dynamic-import-webpack": "^1.1.0",
+        "babel-preset-env": "^1.7.0",
+        "pkg": "^4.3.4",
+        "webpack": "^4.25.1"
+    }
 }

@@ -9,7 +9,7 @@ config.context = path.resolve(__dirname, '..');
 
 // Entry
 config.entry = {
-    index: path.resolve(__dirname, 'src/bin/index')
+    index: path.resolve(__dirname, 'src/main')
 };
 
 // Target
@@ -33,7 +33,7 @@ config.module = {
         {
             test: /\.js$/,
             use: 'babel-loader',
-            exclude: /node_modules|vendor/
+            exclude: /node_modules/
         }
     ]
 };
