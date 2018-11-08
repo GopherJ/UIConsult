@@ -7,11 +7,11 @@ const config = module.exports = {
 };
 
 // Set context to the root of the project
-config.context = path.resolve(__dirname, '..');
+config.context = path.resolve(__dirname, '../');
 
 // Entry
 config.entry = {
-    index: path.resolve(__dirname, 'src/index.js')
+    index: path.join(config.context, 'src/index.js')
 };
 
 // Target
@@ -22,7 +22,7 @@ config.externals = [nodeExternals()];
 
 // Output
 config.output = {
-    path: path.resolve(__dirname, 'dist'),
+    path: path.join(config.context, 'dist'),
     filename: '[name].js'
 };
 
@@ -45,10 +45,13 @@ config.module = {
 
 if (process.env.NODE_ENV === 'production')
 {
+    config.mode = 'production';
     config.optimization = {
         minimizer: [new UglifyJsPlugin({
             parallel: true,
             extractComments: true
         })]
     };
+} else {
+   config.mode = 'development';
 }
