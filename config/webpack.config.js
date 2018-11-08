@@ -1,4 +1,6 @@
 const path = require('path');
+const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
+const nodeExternals = require('webpack-node-externals');
 
 const config = module.exports = {
     plugins: []
@@ -9,11 +11,14 @@ config.context = path.resolve(__dirname, '..');
 
 // Entry
 config.entry = {
-    index: path.resolve(__dirname, 'src/main')
+    index: path.resolve(__dirname, 'src/index.js')
 };
 
 // Target
 config.target = 'node';
+
+// Externals
+config.externals = [nodeExternals()];
 
 // Output
 config.output = {
@@ -37,3 +42,13 @@ config.module = {
         }
     ]
 };
+
+if (process.env.NODE_ENV === 'production')
+{
+    config.optimization = {
+        minimizer: [new UglifyJsPlugin({
+            parallel: true,
+            extractComments: true
+        })]
+    };
+}

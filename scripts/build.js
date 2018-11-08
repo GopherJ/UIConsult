@@ -1,14 +1,9 @@
-const config = require('../config/webpack.config');
-const webpack = require('webpack');
-const { exec } = require('pkg');
-const { targets } = require('../config/prod.conf');
-
 process.env.NODE_ENV = 'production';
 
+const config = require('../config/webpack.config');
+const webpack = require('webpack');
 const ora = require('ora');
-const path = require('path');
 const chalk = require('chalk');
-
 
 const spinner = ora('building for production...');
 spinner.start();
@@ -29,11 +24,6 @@ webpack(config, (err, stats) => {
         console.log(chalk.red('  Build failed with errors.\n'));
         process.exit(1);
     }
-
-    for (let i = 0; i < targets.length; i += 1)
-    {
-    }
-
 
     console.log(chalk.cyan('  Build complete.\n'))
 });

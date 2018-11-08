@@ -4,6 +4,7 @@
     "description": "glo2 project in utt",
     "main": "index.js",
     "scripts": {
+        "build": "cd scripts && node build.js"
     },
     "keywords": [],
     "author": "Cheng JIANG",
@@ -19,7 +20,14 @@
         "babel-loader": "^8.0.4",
         "babel-plugin-dynamic-import-webpack": "^1.1.0",
         "babel-preset-env": "^1.7.0",
+        "chalk": "^2.4.1",
+        "ora": "^3.0.0",
         "pkg": "^4.3.4",
-        "webpack": "^4.25.1"
+        "uglifyjs-webpack-plugin": "^2.0.1",
+        "webpack": "^4.25.1",
+        "webpack-node-externals": "^1.7.2"
+    },
+    "dependencies": {
+        "commander": "^2.19.0"
     }
 }
