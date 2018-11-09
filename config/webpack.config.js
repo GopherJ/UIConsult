@@ -55,5 +55,4 @@ if (process.env.NODE_ENV === 'production')
 } else {
     config.output.filename = '[name].js';
     config.mode = 'development';
-    config.devtool = '#source-map';
 }
