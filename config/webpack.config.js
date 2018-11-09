@@ -22,8 +22,7 @@ config.externals = [nodeExternals()];
 
 // Output
 config.output = {
-    path: path.join(config.context, 'dist'),
-    filename: '[name].js'
+    path: path.join(config.context, 'dist')
 };
 
 // Resolver
@@ -45,6 +44,7 @@ config.module = {
 
 if (process.env.NODE_ENV === 'production')
 {
+    config.output.filename = '[name].min.js';
     config.mode = 'production';
     config.optimization = {
         minimizer: [new UglifyJsPlugin({
@@ -53,5 +53,6 @@ if (process.env.NODE_ENV === 'production')
         })]
     };
 } else {
-   config.mode = 'development';
+    config.output.filename = '[name].js';
+    config.mode = 'development';
 }
