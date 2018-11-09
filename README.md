@@ -13,13 +13,12 @@ GL02 project starter
 
 - `install npm or yarn (yarn is better), nvm`
 - `nvm use`
-- `git clone https://github.com/GopherJ/UIConsult && cd UIConsult`
-- `create your own remote branch on this repo`
-- `git checkout -b yourbranch`
+- `fork this project`
+- `git clone https://github.com/youraccount/UIConsult && cd UIConsult`
 - `yarn install OR npm install`
 - `develop and commit`
-- `push to your own branch`
-- `send PR on this repo`
+- `push to your own repo`
+- `send PR to this repo
 
 
 ### Dependencies
