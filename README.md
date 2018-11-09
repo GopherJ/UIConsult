@@ -18,7 +18,7 @@ GL02 project starter
 - `yarn OR npm install`
 - `develop and commit`
 - `push to your own repo`
-- `send PR to this repo
+- `send PR to this repo`
 
 
 ### Dependencies
