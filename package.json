@@ -2,7 +2,7 @@
     "name": "uiconsult",
     "version": "1.0.0",
     "description": "glo2 project in utt",
-    "main": "dist/index.js",
+    "main": "dist/index.min.js",
     "scripts": {
         "build": "cd scripts && cross-env NODE_ENV=production node build.js",
         "compile": "cd scripts && ./build-release.sh",
