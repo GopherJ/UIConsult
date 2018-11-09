@@ -4,7 +4,8 @@
     "description": "glo2 project in utt",
     "main": "index.js",
     "scripts": {
-        "build": "cd scripts && node build.js"
+        "build": "cd scripts && node build.js",
+        "release": "cd scripts && ./build-release.sh"
     },
     "keywords": [],
     "author": "Cheng JIANG",

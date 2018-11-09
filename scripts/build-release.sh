@@ -1,5 +1,13 @@
 #!/bin/bash
 
-target="node8-linux-x64"
+set -e
 
-../node_modules/.bin/pkg ../src/index.js --target="$target"
+nodeversion=8
+targets=("win" "linux" "osx")
+output="uiconsult"
+
+for target in ${targets[@]}
+do
+    echo "compiling for $target"
+    ../node_modules/.bin/pkg ../dist/index.js --target="node$nodeversion-$target-x64" --out-path="../bin/$target-x64/$output"
+done
