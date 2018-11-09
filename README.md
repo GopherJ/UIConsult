@@ -15,7 +15,7 @@ GL02 project starter
 - `nvm use`
 - `fork this project`
 - `git clone https://github.com/youraccount/UIConsult && cd UIConsult`
-- `yarn install OR npm install`
+- `yarn OR npm install`
 - `develop and commit`
 - `push to your own repo`
 - `send PR to this repo
