@@ -35,6 +35,7 @@
         "commander": "^2.19.0",
         "vega": "^4.3.0",
         "vega-embed": "^3.23.1",
-        "vega-lite": "^3.0.0-rc8"
+        "vega-lite": "^3.0.0-rc8",
+        "walkdir": "^0.0.12"
     }
 }
