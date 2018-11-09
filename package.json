@@ -5,7 +5,8 @@
     "main": "dist/index.js",
     "scripts": {
         "build": "cd scripts && cross-env NODE_ENV=production node build.js",
-        "release": "cd scripts && ./build-release.sh"
+        "compile": "cd scripts && ./build-release.sh",
+        "test": "cd tests && ./node_modules/.bin/mocha ./**/*.js"
     },
     "keywords": [],
     "author": "Cheng JIANG",
@@ -23,8 +24,10 @@
         "babel-plugin-dynamic-import-webpack": "^1.1.0",
         "babel-preset-env": "^1.7.0",
         "babel-preset-stage-0": "^6.24.1",
+        "chai": "^4.2.0",
         "chalk": "^2.4.1",
         "cross-env": "^5.2.0",
+        "mocha": "^5.2.0",
         "ora": "^3.0.0",
         "pkg": "^4.3.4",
         "uglifyjs-webpack-plugin": "^2.0.1",
