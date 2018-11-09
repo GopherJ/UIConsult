@@ -6,7 +6,8 @@
     "scripts": {
         "build": "cd scripts && cross-env NODE_ENV=production node build.js",
         "compile": "cd scripts && ./build-release.sh",
-        "test": "cd tests && ./node_modules/.bin/mocha ./**/*.js"
+        "test": "cd tests && ../node_modules/.bin/mocha ./**/*.js",
+        "dev": "cd scripts && cross-env NODE_ENV=development node build.js"
     },
     "keywords": [],
     "author": "Cheng JIANG",
