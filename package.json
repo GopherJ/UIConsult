@@ -32,6 +32,9 @@
         "webpack-node-externals": "^1.7.2"
     },
     "dependencies": {
-        "commander": "^2.19.0"
+        "commander": "^2.19.0",
+        "vega": "^4.3.0",
+        "vega-embed": "^3.23.1",
+        "vega-lite": "^3.0.0-rc8"
     }
 }
