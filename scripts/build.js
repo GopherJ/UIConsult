@@ -1,5 +1,3 @@
-process.env.NODE_ENV = 'production';
-
 const config = require('../config/webpack.config');
 const webpack = require('webpack');
 const ora = require('ora');

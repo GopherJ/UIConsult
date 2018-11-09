@@ -2,9 +2,9 @@
     "name": "uiconsult",
     "version": "1.0.0",
     "description": "glo2 project in utt",
-    "main": "index.js",
+    "main": "dist/index.js",
     "scripts": {
-        "build": "cd scripts && node build.js",
+        "build": "cd scripts && cross-env NODE_ENV=production node build.js",
         "release": "cd scripts && ./build-release.sh"
     },
     "keywords": [],
@@ -24,6 +24,7 @@
         "babel-preset-env": "^1.7.0",
         "babel-preset-stage-0": "^6.24.1",
         "chalk": "^2.4.1",
+        "cross-env": "^5.2.0",
         "ora": "^3.0.0",
         "pkg": "^4.3.4",
         "uglifyjs-webpack-plugin": "^2.0.1",
