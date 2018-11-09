@@ -3,6 +3,12 @@
 GL02 project starter
 
 
+### IDE
+
+- `vscode`
+- `webstorm`
+
+
 ### Development
 
 - `install npm or yarn (yarn is better), nvm`
@@ -36,7 +42,9 @@ And you need also to learn `mocha` and `chai` so that you can write unit test
 
 3. By default we will use ES6 and babel, so you need to use `import` and `export` to replace `require`
 
-4. `vega` requires `libcairo2-dev` `libjpeg-dev` `libgif-dev` installed, you need to install them by yourself. On ubuntu, you can install them bu running:
+4. Install `editorconfig` plugin for your IDE to make sure that we have a common basic code format
+
+5. `vega` requires `libcairo2-dev` `libjpeg-dev` `libgif-dev` installed, you need to install them by yourself. On ubuntu, you can install them bu running:
 
     ```bash
     sudo apt install libcairo2-dev libjpeg-dev libgif-dev
