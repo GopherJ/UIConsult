@@ -36,7 +36,7 @@
         "webpack-node-externals": "^1.7.2"
     },
     "dependencies": {
-        "commander": "^2.19.0",
+        "caporal": "^0.10.0",
         "table": "^5.1.0",
         "vega": "^4.3.0",
         "vega-embed": "^3.23.1",
