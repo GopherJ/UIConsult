@@ -1,5 +1,5 @@
 const path = require('path');
-const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
+const TerserPlugin = require('terser-webpack-plugin');
 const nodeExternals = require('webpack-node-externals');
 
 const config = module.exports = {
@@ -47,7 +47,7 @@ if (process.env.NODE_ENV === 'production')
     config.output.filename = '[name].min.js';
     config.mode = 'production';
     config.optimization = {
-        minimizer: [new UglifyJsPlugin({
+        minimizer: [new TerserPlugin({
             parallel: true,
             extractComments: true
         })]
