@@ -1,6 +1,7 @@
 /**
  * This is for SPEC_1
  */
+import cli from 'caporal';
 
 const command = {
     name: 'loademails',
@@ -15,7 +16,9 @@ const argument = {
 const options = [
     {
         var: '',
-        description: ''
+        description: '',
+        type: '',
+        default: ''
     }
 ];
 
