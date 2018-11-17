@@ -75,10 +75,34 @@ class EmailParser {
         if (!hasReceivers) {
             this._isMigrated = true;
         } else {
-            this._receivers = matches[1].split(',');
+            this._receivers = matches[1].split(', ');
         }
 
         return this;
+    }
+
+    parseCcReceivers() {
+        const re = /^Cc: ?(.*)/;
+        const matches = this._mailText.match(re);
+        const hasCcReceivers = matches !== null;
+
+        if (!hasCcReceivers) {
+            this._ccreceivers = [];
+        } else {
+            this._ccreceivers = matches[1].split(', ');
+        }
+    }
+
+    parseBccReceivers() {
+        const re = /^Cc: ?(.*)/;
+        const matches = this._mailText.match(re);
+        const hasBccReceivers = matches !== null;
+
+        if (!hasBccReceivers) {
+            this._bccreceivers = [];
+        } else {
+            this._bccreceivers = matches[1].split(', ');
+        }
     }
 }
 
