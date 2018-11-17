@@ -1,4 +1,4 @@
-class MailParser {
+class EmailParser {
     constructor(mailText) {
         this._isMigrated = false;
         this._mailText = mailText;
@@ -7,6 +7,8 @@ class MailParser {
     parseId() {
         const re = /^Message-ID: ?<(.*)>/;
         this._id = this._mailText.match(re)[1];
+
+        return this;
     }
 
     parseDate() {
@@ -24,6 +26,7 @@ class MailParser {
             'Nov': 11,
             'Dec': 12
         };
+
         const re = /^(Mon|Tue|Wed|Thu|Fri|Sat|Sun), ([1-31]) (Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sept|Oct|Nov|Dec) ([0-9]{4}) ([0-9]{2}):([0-9]{2}):([0-9]{2})/;
         let [
             _,
@@ -39,21 +42,29 @@ class MailParser {
         hh = +hh + 8, mm = +mm, ss = +ss;
 
         this._date = new Date(y, m, d, hh, mm, ss);
+
+        return this;
     }
 
     parseSubject() {
         const re = /^Subject: ?(.*)/;
         this._subject = this._mailText.match(re)[1];
+
+        return this;
     }
 
     parseContent() {
         const re = /[\s\S]*\n\n([\s\S]*)/;
         this._content = this._mailText.match(re)[1];
+
+        return this;
     }
 
     parseSender() {
         const re = /^From: ?(.*)/;
         this._sender = this._mailText.match(re)[1];
+
+        return this;
     }
 
     parseReceivers() {
@@ -66,5 +77,9 @@ class MailParser {
         } else {
             this._receivers = matches[1].split(',');
         }
+
+        return this;
     }
 }
+
+export default EmailParser;
