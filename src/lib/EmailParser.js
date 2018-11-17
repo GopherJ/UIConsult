@@ -1,3 +1,9 @@
+import Email from './Email';
+
+
+/**
+ * Email Parser
+ */
 class EmailParser {
     constructor(mailText) {
         this._isMigrated = false;
@@ -91,6 +97,8 @@ class EmailParser {
         } else {
             this._ccreceivers = matches[1].split(', ');
         }
+
+        return this;
     }
 
     parseBccReceivers() {
@@ -103,6 +111,31 @@ class EmailParser {
         } else {
             this._bccreceivers = matches[1].split(', ');
         }
+
+        return this;
+    }
+
+    parseAndCreateEmail() {
+        this.parseId()
+            .parseDate()
+            .parseSender()
+            .parseReceivers()
+            .parseSubject()
+            .parseContent()
+            .parseCcReceivers()
+            .parseBccReceivers();
+
+        this._parsedEmail = new Email(
+            this._sender,
+            this._receivers,
+            this._ccreceivers,
+            this._bccreceivers,
+            this._subject,
+            this._date,
+            this._content
+        );
+
+        return this._parsedEmail;
     }
 }
 
