@@ -6,6 +6,7 @@ import FileWalker from '../lib/FileWalker';
 import EmailParser from '../lib/EmailParser';
 import chalk from 'chalk';
 import util from 'util';
+import table from 'table';
 
 const alias = 'lms';
 
@@ -43,26 +44,50 @@ const _parseDate = dateStr => {
 
     if (ymdMatches !== null) {
         const [d, m, y] = ymdMatches.slice(1).map(x => +x);
+        if (m < 1 || m > 12) {
+            return 'Invalid Month';
+        }
+
+        if (d < 1 || d > new Date(y, m, 0).getDate()) {
+            return 'Invalid Day';
+        }
+
         return new Date(y, m - 1, d);
     } else if (ymMatches !== null) {
         const [m, y] = ymMatches.slice(1).map(x => +x);
+        if (m < 1 || m > 12) {
+            return 'Invalid Month';
+        }
+
         return new Date(y, m - 1);
     } else if (yMatches !== null) {
         const [y] = yMatches.slice(1).map(x => +x);
         return new Date(y, 0);
+    } else {
+        return 'Invalid Date';
     }
 };
 
 const _checkDate = (email, options, logger) => {
     if (options.dateFrom) {
-        if (_parseDate(options.dateFrom) > email.date) {
-            return false;
+        const res = _parseDate(options.dateFrom);
+
+        if (util.isDate(res)) {
+            if (res > email.date) return false;
+        } else {
+            logger.error(chalk.red('Start Date: ' + res));
+            process.exit(1);
         }
     }
 
     if (options.dateTo) {
-        if (_parseDate(options.dateTo) < email.date) {
-            return false;
+        const res = _parseDate(options.dateTo);
+
+        if (util.isDate(res)) {
+            if (res < email.date) return false;
+        } else {
+            logger.error(chalk.red('End Date: ' + res));
+            process.exit(1);
         }
     }
 
@@ -76,10 +101,24 @@ const action = (args, options, logger) => {
             return logger.error(chalk.red(`Error reading ${path}`));
         } else {
             const email = (new EmailParser(data)).parseAndCreateEmail();
-            if (options.dateFrom) {
-
-            }
+            if (_checkDate(email, options, logger)) emails.push(email);
         }
+    }, () => {
+        const tb = [
+            ['Subject', 'Date', 'Senders', 'Receivers', 'Content']
+        ];
+
+        emails.forEach(email => {
+            tb.push([
+                email.subject,
+                email.date,
+                email.sender,
+                email.receivers.join(', '),
+                email.content
+            ]);
+        });
+
+        process.stdout.write(table(tb));
     });
 };
 
