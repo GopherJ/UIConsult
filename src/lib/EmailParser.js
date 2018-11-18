@@ -162,3 +162,4 @@ class EmailParser {
     }
 }
 
+export default EmailParser;
