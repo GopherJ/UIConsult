@@ -1,8 +1,30 @@
 import Email from './Email';
 
-
 /**
  * Email Parser
+ *
+ * Message-ID: <8229279.1075851877390.JavaMail.evans@thyme>
+ * Date: Tue, 11 Jan 2000 09:45:00 -0800 (PST)
+ * From: mike.riedel@enron.com
+ * To: rick.cates@enron.com, butch.russell@enron.com, leo.nichols@enron.com,
+ * 	rick.loveless@enron.com, ron.harkrader@enron.com,
+ * 	ron.beidelman@enron.com, larry.campbell@enron.com,
+ * 	william.kendrick@enron.com
+ * Subject: Team Meeting Information
+ * Mime-Version: 1.0
+ * Content-Type: text/plain; charset=us-ascii
+ * Content-Transfer-Encoding: 7bit
+ * X-From: Mike Riedel
+ * X-To: Rick Cates, Butch Russell, Leo Nichols, Rick Loveless, Ron Harkrader, Ron Beidelman, Larry Campbell, William Kendrick
+ * X-cc:
+ * X-bcc:
+ * X-Folder: \Larry_Campbell_Nov2001_1\Notes Folders\2000 goals and objectives
+ * X-Origin: CAMPBELL-L
+ * X-FileName: lcampbe.nsf
+ *
+ * Rick, please see the attached files for the teams 2000 objectives and the
+ * teams response to the submittal of annual cetifications.  It also covers
+ * roles and responsiblities for the entire air compliance program.
  */
 class EmailParser {
     constructor(mailText) {
@@ -11,7 +33,7 @@ class EmailParser {
     }
 
     parseId() {
-        const re = /^Message-ID: ?<(.*)>/;
+        const re = /^Message-ID: ?<(.*)>/m;
         this._id = this._mailText.match(re)[1];
 
         return this;
@@ -33,7 +55,8 @@ class EmailParser {
             'Dec': 12
         };
 
-        const re = /^(Mon|Tue|Wed|Thu|Fri|Sat|Sun), ([1-31]) (Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sept|Oct|Nov|Dec) ([0-9]{4}) ([0-9]{2}):([0-9]{2}):([0-9]{2})/;
+        // Todo: Tue, 1 Jan
+        const re = /^Date: ?(Mon|Tue|Wed|Thu|Fri|Sat|Sun), ([0-9]{2}) (Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sept|Oct|Nov|Dec) ([0-9]{4}) ([0-9]{2}):([0-9]{2}):([0-9]{2})/m;
         let [
             _,
             d,
@@ -53,7 +76,7 @@ class EmailParser {
     }
 
     parseSubject() {
-        const re = /^Subject: ?(.*)/;
+        const re = /^Subject: ?(.*)/m;
         this._subject = this._mailText.match(re)[1];
 
         return this;
@@ -67,49 +90,49 @@ class EmailParser {
     }
 
     parseSender() {
-        const re = /^From: ?(.*)/;
+        const re = /^From: ?(.*)/m;
         this._sender = this._mailText.match(re)[1];
 
         return this;
     }
 
     parseReceivers() {
-        const re = /^To: ?(.*)/;
+        const re = /(?:To: ?)((?:(?:[^<>()\[\]\\.,;:\s@"]+(?:\.[^<>()\[\]\\.,;:\s@"]+)*)|(?:".+"))@(?:(?:\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(?:(?:[a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))[,\t\n ]*)*/;
         const matches = this._mailText.match(re);
         const hasReceivers = matches !== null;
 
         if (!hasReceivers) {
             this._isMigrated = true;
         } else {
-            this._receivers = matches[1].split(', ');
+            this._receivers = matches[0].split(',').map(x => x.replace(/(\s|\n)+/, '')).map(x => x.replace(/^To:/, '')).map(x => x.replace(/\n/, ''));
         }
 
         return this;
     }
 
     parseCcReceivers() {
-        const re = /^Cc: ?(.*)/;
+        const re = /(?:Cc: ?)((?:(?:[^<>()\[\]\\.,;:\s@"]+(?:\.[^<>()\[\]\\.,;:\s@"]+)*)|(?:".+"))@(?:(?:\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(?:(?:[a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))[,\t\n ]*)*/;
         const matches = this._mailText.match(re);
         const hasCcReceivers = matches !== null;
 
         if (!hasCcReceivers) {
             this._ccreceivers = [];
         } else {
-            this._ccreceivers = matches[1].split(', ');
+            this._ccreceivers = matches[0].split(',').map(x => x.replace(/(\s|\n)+/, '')).map(x => x.replace(/^Cc:/, '')).map(x => x.replace(/\n/, ''));
         }
 
         return this;
     }
 
     parseBccReceivers() {
-        const re = /^Cc: ?(.*)/;
+        const re = /(?:Bcc: ?)((?:(?:[^<>()\[\]\\.,;:\s@"]+(?:\.[^<>()\[\]\\.,;:\s@"]+)*)|(?:".+"))@(?:(?:\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(?:(?:[a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))[,\t\n ]*)*/;
         const matches = this._mailText.match(re);
         const hasBccReceivers = matches !== null;
 
         if (!hasBccReceivers) {
             this._bccreceivers = [];
         } else {
-            this._bccreceivers = matches[1].split(', ');
+            this._bccreceivers = matches[0].split(',').map(x => x.replace(/(\s|\n)+/, '')).map(x => x.replace(/^Bcc:/, '')).map(x => x.replace(/\n/, ''));
         }
 
         return this;
@@ -139,4 +162,3 @@ class EmailParser {
     }
 }
 
-export default EmailParser;
