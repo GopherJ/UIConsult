@@ -2,12 +2,10 @@
     "name": "uiconsult",
     "version": "1.0.0",
     "description": "glo2 project in utt",
-    "main": "dist/index.min.js",
+    "main": "dist/index.js",
     "scripts": {
-        "build": "cd scripts && cross-env NODE_ENV=production node build.js",
-        "compile": "cd scripts && ./build-release.sh",
-        "test": "cd tests && ../node_modules/.bin/mocha ./**/*.js",
-        "dev": "cd scripts && cross-env NODE_ENV=development node build.js"
+        "build": "cd scripts && ./build-release.sh",
+        "test": "cd tests && ../node_modules/.bin/mocha ./**/*.js"
     },
     "keywords": [],
     "author": "Cheng JIANG",
@@ -20,19 +18,9 @@
     ],
     "license": "MIT",
     "devDependencies": {
-        "@babel/core": "^7.1.5",
-        "babel-loader": "^8.0.4",
-        "babel-plugin-dynamic-import-webpack": "^1.1.0",
-        "babel-preset-env": "^1.7.0",
-        "babel-preset-stage-0": "^6.24.1",
         "chai": "^4.2.0",
-        "cross-env": "^5.2.0",
         "mocha": "^5.2.0",
-        "ora": "^3.0.0",
-        "pkg": "^4.3.4",
-        "terser-webpack-plugin": "^1.1.0",
-        "webpack": "^4.25.1",
-        "webpack-node-externals": "^1.7.2"
+        "pkg": "^4.3.4"
     },
     "dependencies": {
         "caporal": "^0.10.0",
