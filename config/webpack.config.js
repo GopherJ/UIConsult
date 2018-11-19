@@ -45,6 +45,7 @@ config.module = {
 if (process.env.NODE_ENV === 'production')
 {
     config.output.filename = '[name].min.js';
+    config.devtool = '#source-map';
     config.mode = 'production';
     config.optimization = {
         minimizer: [new TerserPlugin({
@@ -55,4 +56,5 @@ if (process.env.NODE_ENV === 'production')
 } else {
     config.output.filename = '[name].js';
     config.mode = 'development';
+    config.devtool = '#source-map';
 }
