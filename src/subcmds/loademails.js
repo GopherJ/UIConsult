@@ -4,7 +4,7 @@
 const cli = require('caporal');
 const chalk = require('chalk');
 const util = require('util');
-const table = require('table');
+const { table } = require('table');
 const FileWalker = require('../lib/FileWalker');
 const EmailParser = require('../lib/EmailParser');
 
@@ -129,4 +129,3 @@ module.exports = {
     options,
     action
 };
-

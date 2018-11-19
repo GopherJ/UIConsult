@@ -57,20 +57,23 @@ class EmailParser {
 
         // Todo: Tue, 1 Jan
         const re = /^Date: ?(Mon|Tue|Wed|Thu|Fri|Sat|Sun), ([0-9]{2}) (Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sept|Oct|Nov|Dec) ([0-9]{4}) ([0-9]{2}):([0-9]{2}):([0-9]{2})/m;
-        let [
-            _,
-            d,
-            m,
-            y,
-            hh,
-            mm,
-            ss
-        ] = this._mailText.match(re).slice(1);
+        const matches = this._mailText.match(re);
+        if (matches !== null) {
+            let [
+                _,
+                d,
+                m,
+                y,
+                hh,
+                mm,
+                ss
+            ] = matches.slice(1);
 
-        d = +d, m = +(monthsMap[m]) - 1, y = +y;
-        hh = +hh + 8, mm = +mm, ss = +ss;
+            d = +d, m = +(monthsMap[m]) - 1, y = +y;
+            hh = +hh + 8, mm = +mm, ss = +ss;
 
-        this._date = new Date(y, m, d, hh, mm, ss);
+            this._date = new Date(y, m, d, hh, mm, ss);
+        }
 
         return this;
     }
