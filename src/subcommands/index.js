@@ -1,7 +1,7 @@
-import loadmails from './loademails';
+import loademails from './loademails';
 
 const subcommands = [
-    loadmails
+    loademails
 ];
 
 export default subcommands;

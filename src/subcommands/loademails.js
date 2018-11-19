@@ -2,11 +2,11 @@
  * This is for SPEC_1
  */
 import cli from 'caporal';
-import FileWalker from '../lib/FileWalker';
-import EmailParser from '../lib/EmailParser';
 import chalk from 'chalk';
 import util from 'util';
 import table from 'table';
+import FileWalker from '../lib/FileWalker';
+import EmailParser from '../lib/EmailParser';
 
 const alias = 'lms';
 
