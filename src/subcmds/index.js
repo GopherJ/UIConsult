@@ -1,7 +1,7 @@
-import loademails from './loademails';
+const loademails = require('./loademails');
 
 const subcommands = [
     loademails
 ];
 
-export default subcommands;
+module.exports = subcommands;

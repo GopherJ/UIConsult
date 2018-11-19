@@ -1,12 +1,12 @@
 /**
  * This is for SPEC_1
  */
-import cli from 'caporal';
-import chalk from 'chalk';
-import util from 'util';
-import table from 'table';
-import FileWalker from '../lib/FileWalker';
-import EmailParser from '../lib/EmailParser';
+const cli = require('caporal');
+const chalk = require('chalk');
+const util = require('util');
+const table = require('table');
+const FileWalker = require('../lib/FileWalker');
+const EmailParser = require('../lib/EmailParser');
 
 const alias = 'lms';
 
@@ -122,7 +122,7 @@ const action = (args, options, logger) => {
     });
 };
 
-export default {
+module.exports = {
     alias,
     command,
     argument,
