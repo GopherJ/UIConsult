@@ -1,28 +1,28 @@
-import cli from 'caporal';
-import subcommands from './subcommands';
+const cli = require('caporal');
+const subcmds = require('./subcmds');
+const { isArrayAndHasLength } = require('./utils')
 
 cli
     .version('0.1.0');
 
-subcommands.forEach(subcommand => {
-    const command = cli
-        .command(subcommand.command.name, subcommand.command.description);
+subcmds.forEach(subcmd => {
+    const { 
+        command, 
+        alias, 
+        argument, 
+        options, 
+        action 
+    } = subcmd;
 
-    if (subcommand.alias) {
-        command.alias(subcommand.alias);
-    }
+    const cmd = cli.command(command.name, command.description);
 
-    if (subcommand.argument) {
-        command.argument(subcommand.argument, subcommand.argument.description);
-    }
+    if (alias) cmd.alias(alias);
+    if (argument) cmd.argument(argument.var, argument.description);
+    if (isArrayAndHasLength(options)) options.forEach(option => {
+        cmd.option(option.var, option.description, option.type, option.default);
+    });
 
-    if (subcommand.options && subcommand.options.length > 0) {
-        subcommand.options.forEach(option => {
-            command.option(option.var, option.description, option.type, option.default);
-        });
-    }
-
-    command.action(subcommand.action);
+    cmd.action(action);
 });
 
 cli.parse(process.argv);
