@@ -1,5 +1,5 @@
-import walk from 'walkdir';
-import fs from 'fs';
+const walk = require('walkdir');
+const fs = require('fs');
 
 /**
  *
@@ -7,7 +7,7 @@ import fs from 'fs';
  * @param cb
  * @param cbend
  */
-export default (dir, cb, cbend) => {
+module.exports = (dir, cb, cbend) => {
     const emitter = walk(dir);
 
     emitter.on('file', (path, stat) => {
@@ -19,6 +19,3 @@ export default (dir, cb, cbend) => {
 
     emitter.on('end', cbend);
 };
-
-
-

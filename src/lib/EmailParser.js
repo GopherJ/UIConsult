@@ -1,4 +1,4 @@
-import Email from './Email';
+const Email = require('./Email');
 
 /**
  * Email Parser
@@ -162,4 +162,4 @@ class EmailParser {
     }
 }
 
-export default EmailParser;
+module.exports = EmailParser;
