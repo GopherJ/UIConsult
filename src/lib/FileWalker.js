@@ -4,18 +4,18 @@ const fs = require('fs');
 /**
  *
  * @param dir
- * @param cb
- * @param cbend
+ * @param {function} file
+ * @param {function} end
  */
-module.exports = (dir, cb, cbend) => {
+module.exports = (dir, file, end) => {
     const emitter = walk(dir);
 
     emitter.on('file', (path, stat) => {
         fs.readFile(path, 'utf8', (err, data) => {
-            if (err) cb(err, path, stat, null);
-            else cb(null, path, stat, data);
+            if (err) file(err, path, stat, null);
+            else file(null, path, stat, data);
         });
     });
 
-    emitter.on('end', cbend);
+    emitter.on('end', end);
 };

@@ -5,6 +5,7 @@ const cli = require('caporal');
 const chalk = require('chalk');
 const util = require('util');
 const { table } = require('table');
+
 const FileWalker = require('../lib/FileWalker');
 const EmailParser = require('../lib/EmailParser');
 
@@ -94,8 +95,10 @@ const _checkDate = (email, options, logger) => {
     return true;
 };
 
+
 const action = (args, options, logger) => {
     const emails = [];
+
     FileWalker(args.dir, (err, path, stat, data) => {
         if (err) {
             return logger.error(chalk.red(`Error reading ${path}`));
