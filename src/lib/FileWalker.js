@@ -1,6 +1,6 @@
 const fs = require('fs');
-const { walk } = require('walk');
 const path = require('path');
+const { walk } = require('walk');
 
 /**
  *

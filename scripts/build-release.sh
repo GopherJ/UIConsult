@@ -11,7 +11,7 @@ do
     echo "compiling for $target"
 
     ../node_modules/.bin/pkg \
-        ../dist/index.js \
+        ../src/index.js \
         --target="node$nodeversion-$target-x64" \
         --out-path="../bin/$target-x64"
 done
