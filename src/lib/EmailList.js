@@ -1,7 +1,7 @@
 /**
  *  Email List
  */
-const table = require('cli-table3');
+const Table = require('cli-table3');
 const os = require('os');
 const { execSync } = require('child_process');
 const Email = require('./Email');
@@ -14,18 +14,18 @@ class EmailList {
         switch(os.platform()) {
             case 'darwin':
             case 'linux':
-                this.cols = process.env.COLUMNS;
+                this.cols = process.stdout.columns;
                 break;
             case 'win32':
-                const rs = execSync('mode con | findStr columns').toString('utf8');
+                const rs = execSync('mode con | findStr Columns').toString('utf8');
                 const numMatches = rs.match(/(\d+)/);
                 if (numMatches !== null) this.cols = +numMatches.slice(1).pop();
                 break;
         }
 
-        this.tb = new table({
+        this.tb = new Table({
             head: ['Subject', 'Date', 'Sender', 'Receivers', 'Content'],
-            colWidths: [1/12, 1/12, 1/12, 1/12, 3/4].map(x => x * this.cols)
+            colWidths: [1/6, 1/6, 1/6, 1/6, 1/6].map(x => Math.floor(x * this.cols))
         });
     }
 
@@ -47,6 +47,10 @@ class EmailList {
 
     toString() {
         return this.tb.toString(); 
+    }
+
+    length() {
+        return this.emails.length;
     }
 }
 
