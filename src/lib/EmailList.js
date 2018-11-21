@@ -3,8 +3,8 @@
  */
 const Table = require('cli-table3');
 const os = require('os');
-const { execSync } = require('child_process');
 const Email = require('./Email');
+const { execSync } = require('child_process');
 
 class EmailList {
     constructor() {

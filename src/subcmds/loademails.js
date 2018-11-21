@@ -3,10 +3,18 @@
  */
 const cli = require('caporal');
 const chalk = require('chalk');
-const util = require('util');
 
 const FileWalker = require('../lib/FileWalker');
 const EmailParser = require('../lib/EmailParser');
+const EmailList = require('../lib/EmailList');
+const ErrMsg = require('../lib/ErrMsg');
+const { 
+    isInRange, 
+    isNull, 
+    isUndefined,
+    lastDayOfMonth, 
+    isNumber
+} = require('../utils');
 
 const alias = 'lms';
 
@@ -20,93 +28,108 @@ const argument = {
     description: 'Directory which store email texts'
 };
 
-const options = [
-    {
+const options = {
+    dateFrom: {
         var: '-df, --date-from',
         description: 'Start date',
         type: cli.STRING
     },
-    {
+    dateTo: {
         var: '-dt, --date-to',
         description: 'End date',
         type: cli.STRING
     }
-];
+};
 
-const _parseDate = dateStr => {
-    const yRe = /^([0-9]{4})$/;
-    const ymRe = /^([0-9]{2})\/([0-9]{4})$/;
-    const ymdRe = /^([0-9]){2}\/([0-9]{2})\/([0-9]{4})$/;
+const parseDate = (dateStr, isDateFrom) => {
+    const re = /^(?:([0-9]{1,2})\/)?(?:([0-9]{1,2})\/)?(?:([0-9]{4}))$/;
+    const matches = dateStr.match(re);
+    const VAR = isDateFrom ? options.dateFrom.var : options.dateTo.var;
 
-    const ymdMatches = dateStr.match(ymdRe);
-    const ymMatches = dateStr.match(ymRe);
-    const yMatches = dateStr.match(yRe);
+    if (!isNull(matches)) {
+        const [
+            d,
+            m,
+            y
+        ] = matches.slice(1).map(x => +x);
 
-    if (ymdMatches !== null) {
-        const [d, m, y] = ymdMatches.slice(1).map(x => +x);
-        if (m < 1 || m > 12) {
-            return 'Invalid Month';
+        if (!isNumber(m) && !isNumber(d)) {
+            return new Date(y, 0);
+        } else if (!isNumber(m)) {
+            if (!isInRange([1, 12], d)) {
+                return new Error(ErrMsg.OPTION_OUT_OF_RANGE(VAR));
+            } else {
+                return new Date(y, d - 1, 0);
+            }
+        } else {
+            if (!isInRange([1, lastDayOfMonth(m, y)], d) || !isInRange([1, 12], m)) {
+                return new Error(ErrMsg.OPTION_OUT_OF_RANGE(VAR));
+            } else {
+                return new Date(y, m - 1, d);
+            }
         }
-
-        if (d < 1 || d > new Date(y, m, 0).getDate()) {
-            return 'Invalid Day';
-        }
-
-        return new Date(y, m - 1, d);
-    } else if (ymMatches !== null) {
-        const [m, y] = ymMatches.slice(1).map(x => +x);
-        if (m < 1 || m > 12) {
-            return 'Invalid Month';
-        }
-
-        return new Date(y, m - 1);
-    } else if (yMatches !== null) {
-        const [y] = yMatches.slice(1).map(x => +x);
-        return new Date(y, 0);
     } else {
-        return 'Invalid Date';
+        return new Error(ErrMsg.OPTION_INVALID_FORMAT(VAR));
     }
 };
 
-const _checkDate = (email, options, logger) => {
-    if (options.dateFrom) {
-        const res = _parseDate(options.dateFrom);
+const checkDateInRange = (email, options, logger) => {
+    const { dateFrom, dateTo } = options;
+    const { date } = email;
 
-        if (util.isDate(res)) {
-            if (res > email.date) return false;
-        } else {
-            logger.error(chalk.red('Start Date: ' + res));
+    if (isUndefined(dateFrom) && isUndefined(dateTo)) {
+        return true;
+    } else if (isUndefined(dateTo)) {
+        const rs = parseDate(dateFrom, true);
+        if (rs instanceof Error) {
+            logger.error(chalk.red(rs.message));
             process.exit(1);
-        }
+        } else if(rs > date) {
+            return false;
+        } 
+
+        return true;
+    } else if (isUndefined(dateFrom)) {
+        const rs = parseDate(dateTo, false);
+        if (rs instanceof Error) {
+            logger.error(chalk.red(rs.message));
+            process.exit(1);
+        } else if(rs < date) {
+            return false;
+        } 
+
+        return true;
     }
 
-    if (options.dateTo) {
-        const res = _parseDate(options.dateTo);
+    const rsFrom = parseDate(dateFrom, true);
+    const rsTo = parseDate(dateTo, false);
 
-        if (util.isDate(res)) {
-            if (res < email.date) return false;
-        } else {
-            logger.error(chalk.red('End Date: ' + res));
-            process.exit(1);
-        }
+    if (rsFrom instanceof Error) {
+        logger.error(chalk.red(rsFrom.message));
+        process.exit(1);
     }
 
-    return true;
+    if (rsTo instanceof Error) {
+        logger.error(chalk.red(rsTo.message));
+        process.exit(1);
+    }
+
+    if (rsFrom > date || rsTo < date) return false;
+    else return true;
 };
 
 
 const action = (args, options, logger) => {
-    const emails = [];
+    const emailList = new EmailList();
 
     FileWalker(args.dir, (err, absPath, data) => {
-        if (err) {
-            return logger.error(chalk.red(`Error reading ${absPath}`));
-        } else {
-            const email = (new EmailParser(data)).parseAndCreateEmail();
-            if (_checkDate(email, options, logger)) emails.push(email);
-        }
+        if (err) return logger.error(chalk.red(ErrMsg.IO_FAILED_TO_READ(absPath)));
+        const emailParser = new EmailParser(data);
+        const email = emailParser.parseAndCreateEmail();
+        
+        if (checkDateInRange(email, options, logger)) emailList.push(email);
     }, () => {
-        process.stdout.write(JSON.stringify(emails, null, 4));
+        process.stdout.write(emailList.toString());
     });
 };
 
