@@ -4,7 +4,6 @@
 const cli = require('caporal');
 const chalk = require('chalk');
 const util = require('util');
-const { table } = require('table');
 
 const FileWalker = require('../lib/FileWalker');
 const EmailParser = require('../lib/EmailParser');
@@ -99,29 +98,15 @@ const _checkDate = (email, options, logger) => {
 const action = (args, options, logger) => {
     const emails = [];
 
-    FileWalker(args.dir, (err, path, stat, data) => {
+    FileWalker(args.dir, (err, absPath, data) => {
         if (err) {
-            return logger.error(chalk.red(`Error reading ${path}`));
+            return logger.error(chalk.red(`Error reading ${absPath}`));
         } else {
             const email = (new EmailParser(data)).parseAndCreateEmail();
             if (_checkDate(email, options, logger)) emails.push(email);
         }
     }, () => {
-        const tb = [
-            ['Subject', 'Date', 'Senders', 'Receivers', 'Content']
-        ];
-
-        emails.forEach(email => {
-            tb.push([
-                email.subject,
-                email.date,
-                email.sender,
-                email.receivers.join(', '),
-                email.content
-            ]);
-        });
-
-        process.stdout.write(table(tb));
+        process.stdout.write(JSON.stringify(emails, null, 4));
     });
 };
 
