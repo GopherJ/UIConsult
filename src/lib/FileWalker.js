@@ -7,10 +7,10 @@ const { walk } = require('walk');
  * @param dir
  * @param {function} file
  * @param {function} end
- * @param {function} error
+ * @param {function} err
  */
 
-module.exports = (dir, file, end, error) => {
+module.exports = (dir, file, end, err) => {
     const emitter = walk(dir, {});
 
     emitter.on('file', (root, stat, next) => {
@@ -22,8 +22,8 @@ module.exports = (dir, file, end, error) => {
         });
     });
 
-    emitter.on('errors', (root, nodeStatsArray, next) => {
-        error(root, nodeStatsArray), next();
+    emitter.on('directoryError', (root, _, next) => {
+        err(root), next();
     });
 
     emitter.on('end', end);
