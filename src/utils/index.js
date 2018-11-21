@@ -1,3 +1,8 @@
+/**
+ *  utils
+ */
+const dayjs = require('dayjs');
+
 const isString = s => typeof s === 'string';
 const isEmptyString = s => s === '';
 const isNull = n => n === null;
@@ -16,6 +21,7 @@ const isInRange = (arr, n)=> isArray(arr)
     && n >= arr[0] 
     && n <= arr[1];
 const lastDayOfMonth = (m, y) => new Date(y, m, 0).getDate();
+const formatDate = d => dayjs(d).format('YYYY-MM-DD HH:mm:ss');
 
 module.exports = {
     isString,
@@ -29,5 +35,6 @@ module.exports = {
     isFunction,
     isAllFuntion,
     isInRange,
-    lastDayOfMonth
+    lastDayOfMonth,
+    formatDate
 };

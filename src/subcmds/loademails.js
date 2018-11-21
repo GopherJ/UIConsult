@@ -127,7 +127,9 @@ const action = (args, options, logger) => {
         const emailParser = new EmailParser(data);
         const email = emailParser.parseAndCreateEmail();
         
-        if (checkDateInRange(email, options, logger)) emailList.push(email);
+        if (checkDateInRange(email, options, logger)) {
+            emailList.push(email);
+        }
     }, () => {
         process.stdout.write(emailList.toString());
     });

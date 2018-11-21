@@ -4,6 +4,8 @@
 const Table = require('cli-table3');
 const os = require('os');
 const Email = require('./Email');
+const { formatDate } = require('../utils');
+
 const { execSync } = require('child_process');
 
 class EmailList {
@@ -35,7 +37,7 @@ class EmailList {
 
             this.tb.push([
                 email.subject,
-                email.date,
+                formatDate(email.date),
                 email.sender,
                 email.receivers.join('\n'),
                 email.content
