@@ -49,14 +49,14 @@ class EmailParser {
             'Jun': 6,
             'Jul': 7,
             'Aug': 8,
-            'Sept': 9,
+            'Sep': 9,
             'Oct': 10,
             'Nov': 11,
             'Dec': 12
         };
 
         // Todo: Tue, 1 Jan
-        const re = /^Date: ?(Mon|Tue|Wed|Thu|Fri|Sat|Sun), ([0-9]{2}) (Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sept|Oct|Nov|Dec) ([0-9]{4}) ([0-9]{2}):([0-9]{2}):([0-9]{2})/m;
+        const re = /^Date: ?(Mon|Tue|Wed|Thu|Fri|Sat|Sun), ([0-9]{1,2}) (Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec) ([0-9]{4}) ([0-9]{2}):([0-9]{2}):([0-9]{2})/m;
         const matches = this._mailText.match(re);
         if (matches !== null) {
             let [
