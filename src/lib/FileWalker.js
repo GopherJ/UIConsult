@@ -1,5 +1,6 @@
 const fs = require('fs');
 const { walk } = require('walk');
+const path = require('path');
 
 /**
  *
@@ -13,9 +14,11 @@ module.exports = (dir, file, end, error) => {
     const emitter = walk(dir, {});
 
     emitter.on('file', (root, stat, next) => {
-        fs.readFile(stat.name, 'utf8', (err, data) => {
-            if (err) file(err, root, stat, null), next();
-            else file(null, root, stat, data), next();
+        const absPath = path.join(root, stat.name);
+
+        fs.readFile(absPath, 'utf8', (err, data) => {
+            if (err) file(err, absPath, null), next();
+            else file(null, absPath, data), next();
         });
     });
 
