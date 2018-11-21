@@ -1,13 +1,15 @@
-const { walk } = require('walk');
 const fs = require('fs');
+const { walk } = require('walk');
 
 /**
  *
  * @param dir
  * @param {function} file
  * @param {function} end
+ * @param {function} error
  */
-module.exports = (dir, file, end) => {
+
+module.exports = (dir, file, end, error) => {
     const emitter = walk(dir, {});
 
     emitter.on('file', (root, stat, next) => {
@@ -18,7 +20,7 @@ module.exports = (dir, file, end) => {
     });
 
     emitter.on('errors', (root, nodeStatsArray, next) => {
-        next();
+        error(root, nodeStatsArray), next();
     });
 
     emitter.on('end', end);
