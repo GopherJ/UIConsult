@@ -8,6 +8,7 @@ const isEmptyString = s => s === '';
 const isNull = n => n === null;
 const isUndefined = n => n === undefined;
 const isArray = arr => Array.isArray(arr);
+const isBoolean = b => typeof b === 'boolean';
 const isDate = d => Object.prototype.toString.call(d) === '[object Date]' && !isNaN(d.getTime());
 const isObject = o => Object.prototype.toString.call(o) === '[object Object]';
 const isNumber = n => typeof n === 'number' && !isNaN(n);
@@ -27,6 +28,7 @@ module.exports = {
     isString,
     isEmptyString,
     isNull,
+    isBoolean,
     isUndefined,
     isDate,
     isObject,
