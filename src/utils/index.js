@@ -15,6 +15,7 @@ const isNumber = n => typeof n === 'number' && !isNaN(n);
 const isArrayAndHasLength = arr => Array.isArray && arr.length > 0;
 const isFunction = f => typeof f === 'function';
 const isAllFuntion = arr => isArray(arr) && arr.every(f => isFunction(f));
+const isAll = (arr, det) => isArrayAndHasLength(arr) && isFunction(det) && arr.every(x => det(x));
 const isInRange = (arr, n)=> isArray(arr) 
     && arr.length === 2 
     && arr.every(x => isNumber(x))
@@ -28,6 +29,7 @@ module.exports = {
     isString,
     isEmptyString,
     isNull,
+    isAll,
     isBoolean,
     isUndefined,
     isDate,
