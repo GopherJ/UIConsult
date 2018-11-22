@@ -27,7 +27,7 @@ Learn these cool packages so that you can use it in this project
 
 - `commander`
 - `table`
-- `vega, vega-lite, vega-embeded`
+- `vega, vega-lite, vega-embed`
 - `walkdir`
 
 And you need also to learn `mocha` and `chai` so that you can write unit test
