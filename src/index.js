@@ -1,6 +1,6 @@
 const cli = require('caporal');
 const subcmds = require('./subcmds');
-const { isArrayAndHasLength, isObject } = require('./utils')
+const { isArrayAndHasLength } = require('./utils')
 
 cli
     .version('0.1.0');
