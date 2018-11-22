@@ -1,5 +1,5 @@
 /**
- * This is for SPEC_1
+ * SPEC_1
  */
 const cli = require('caporal');
 const chalk = require('chalk');
@@ -24,12 +24,12 @@ const alias = 'lms';
 
 const command = {
     name: 'loademails',
-    description: 'Load all emails of specific period'
+    description: 'Load emails of specific period'
 };
 
 const argument = {
     var: '<dir>',
-    description: 'Directory which store email texts'
+    description: 'Directory where store emails'
 };
 
 const options = {
@@ -105,7 +105,6 @@ const checkDateInRange = (email, options) => {
     if (rsFrom > date || rsTo < date) return false;
     return true;
 };
-
 
 const action = (args, options, logger) => {
     const emailList = new EmailList();
