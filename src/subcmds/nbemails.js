@@ -182,7 +182,7 @@ const action = (args, options, logger) => {
                 case exchanged.SENT:
                     sent += 1;
                     break;
-                case exchanged.received:
+                case exchanged.RECEIVED:
                     received += 1;
                     break;
                 default:
