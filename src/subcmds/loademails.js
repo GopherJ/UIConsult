@@ -3,11 +3,14 @@
  */
 const cli = require('caporal');
 const chalk = require('chalk');
+const ora = require('ora');
 
 const FileWalker = require('../lib/FileWalker');
 const EmailParser = require('../lib/EmailParser');
 const EmailList = require('../lib/EmailList');
 const ErrMsg = require('../lib/ErrMsg');
+const InfoMsg = require('../lib/InfoMsg');
+
 const { 
     isInRange, 
     isNull, 
@@ -121,6 +124,7 @@ const checkDateInRange = (email, options, logger) => {
 
 const action = (args, options, logger) => {
     const emailList = new EmailList();
+    const spinner = ora(InfoMsg.Loading).start();
 
     FileWalker(args.dir, (err, absPath, data) => {
         if (err) return logger.error(chalk.red(ErrMsg.IO_FAILED_TO_READ(absPath)));
@@ -130,8 +134,10 @@ const action = (args, options, logger) => {
         
         if (checkDateInRange(email, options, logger)) emailList.push(email);
     }, () => {
+        spinner.stop();
         process.stdout.write(emailList.toString());
     }, path => {
+        spinner.stop();
         logger.error(chalk.red(ErrMsg.IO_PERMISSION_DENIED(path)));
     });
 };
