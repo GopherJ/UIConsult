@@ -55,7 +55,7 @@ And you need also to learn `mocha` and `chai` so that you can write unit test
 The executable will be named as `uic`.
 
 1. `uic --help, -h`                               :           display help information
-2. `uic --version, -v`                            :           display version
+2. `uic --version, -V`                            :           display version
 3. `uic --date-from, --date-to, -df, -dt`         :           specify period of time, e.g.`2018-10-05 11:40:20`, by default it's included
 4. `uic --employee, -e`                           :           specify empolyee name
 5. `uic --out-dir`                                :           specify where the svg/png file should be put in
