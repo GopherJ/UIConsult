@@ -77,7 +77,7 @@ const parseDate = (dateStr, isDateFrom) => {
     }
 };
 
-const checkDateInRange = (email, options, logger) => {
+const checkDateInRange = (email, options) => {
     const { dateFrom, dateTo } = options;
     const { date } = email;
 
@@ -85,41 +85,25 @@ const checkDateInRange = (email, options, logger) => {
         return true;
     } else if (isUndefined(dateTo)) {
         const rs = parseDate(dateFrom, true);
-        if (rs instanceof Error) {
-            logger.error(chalk.red(rs.message));
-            process.exit(1);
-        } else if(rs > date) {
-            return false;
-        } 
 
+        if (rs instanceof Error) return rs;
+        if(rs > date) return false;
         return true;
     } else if (isUndefined(dateFrom)) {
         const rs = parseDate(dateTo, false);
-        if (rs instanceof Error) {
-            logger.error(chalk.red(rs.message));
-            process.exit(1);
-        } else if(rs < date) {
-            return false;
-        } 
 
+        if (rs instanceof Error) return rs;
+        if(rs < date) return false;
         return true;
     }
 
     const rsFrom = parseDate(dateFrom, true);
     const rsTo = parseDate(dateTo, false);
 
-    if (rsFrom instanceof Error) {
-        logger.error(chalk.red(rsFrom.message));
-        process.exit(1);
-    }
-
-    if (rsTo instanceof Error) {
-        logger.error(chalk.red(rsTo.message));
-        process.exit(1);
-    }
-
+    if (rsFrom instanceof Error) return rsFrom;
+    if (rsTo instanceof Error) return rsTo
     if (rsFrom > date || rsTo < date) return false;
-    else return true;
+    return true;
 };
 
 
@@ -132,8 +116,10 @@ const action = (args, options, logger) => {
 
         const emailParser = new EmailParser(data);
         const email = emailParser.parseAndCreateEmail();
-        
-        if (checkDateInRange(email, options, logger)) emailList.push(email);
+
+        const rs = checkDateInRange(email, options);
+        if (rs instanceof Error) spinner.stop(), logger.error(chalk.red(rs.message)), process.exit(1);
+        else if (rs) emailList.push(email);
     }, () => {
         spinner.stop();
         process.stdout.write(emailList.toString());
