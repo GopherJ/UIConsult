@@ -179,14 +179,14 @@ const action = (args, options, logger) => {
             spinner.stop(), logger.error(chalk.red(rsEmployee.message)), process.exit(1);
         else if (rsDate) {
             switch(rsEmployee) {
-                case exchanged.SENT:
-                    sent += 1;
-                    break;
-                case exchanged.RECEIVED:
-                    received += 1;
-                    break;
-                default:
-                    break;
+            case exchanged.SENT:
+                sent += 1;
+                break;
+            case exchanged.RECEIVED:
+                received += 1;
+                break;
+            default:
+                break;
             }
         }
     }, () => {

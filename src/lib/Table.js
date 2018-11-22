@@ -26,15 +26,15 @@ class Table {
 
     updateCols() {
         switch(os.platform()) {
-            case 'darwin':
-            case 'linux':
-                this.cols = process.stdout.columns;
-                break;
-            case 'win32':
-                const rs = execSync('mode con | findStr Columns').toString('utf8');
-                const numMatches = rs.match(/(\d+)/);
-                if (numMatches !== null) this.cols = +numMatches.slice(1).pop();
-                break;
+        case 'darwin':
+        case 'linux':
+            this.cols = process.stdout.columns;
+            break;
+        case 'win32':
+            const rs = execSync('mode con | findStr Columns').toString('utf8');
+            const numMatches = rs.match(/(\d+)/);
+            if (numMatches !== null) this.cols = +numMatches.slice(1).pop();
+            break;
         }
 
         return this;
