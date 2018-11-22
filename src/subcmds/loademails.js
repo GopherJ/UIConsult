@@ -8,8 +8,9 @@ const ora = require('ora');
 const FileWalker = require('../lib/FileWalker');
 const EmailParser = require('../lib/EmailParser');
 const EmailList = require('../lib/EmailList');
-const ErrMsg = require('../lib/ErrMsg');
-const InfoMsg = require('../lib/InfoMsg');
+
+const ErrMsg = require('../msg/ErrMsg');
+const InfoMsg = require('../msg/InfoMsg');
 
 const { 
     isInRange, 
