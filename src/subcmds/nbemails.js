@@ -191,7 +191,6 @@ const action = (args, options, logger) => {
         }
     }, () => {
         spinner.stop();
-        console.log(sent, received)
 
         tb.push([
             options.employee, 
