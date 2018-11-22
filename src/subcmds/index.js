@@ -1,7 +1,9 @@
 const loademails = require('./loademails');
+const nbemails = require('./nbemails');
 
-const subcommands = [
-    loademails
+const subcmds = [
+    loademails,
+    nbemails
 ];
 
-module.exports = subcommands;
+module.exports = subcmds;

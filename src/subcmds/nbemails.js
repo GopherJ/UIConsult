@@ -7,7 +7,7 @@ const ora = require('ora');
 
 const FileWalker = require('../lib/FileWalker');
 const EmailParser = require('../lib/EmailParser');
-const EmailList = require('../lib/EmailList');
+const Table = require('../lib/Table');
 
 const ErrMsg = require('../msg/ErrMsg');
 const InfoMsg = require('../msg/InfoMsg');
@@ -151,8 +151,18 @@ const checkEmployeeName = (email, options) => {
 };
 
 const action = (args, options, logger) => {
-    const emailList = new EmailList();
     const spinner = ora(InfoMsg.Loading).start();
+
+    let sent = 0;
+    let received = 0;
+
+    const tb = new Table([
+        'Employee Name',
+        'Time Period',
+        'Sent Emails',
+        'Received Emails',
+        'Total of exchanged Emails'
+    ]);
 
     FileWalker(args.dir, (err, absPath, data) => {
         if (err) return logger.error(chalk.red(ErrMsg.IO_FAILED_TO_READ(absPath)));
@@ -167,10 +177,29 @@ const action = (args, options, logger) => {
             spinner.stop(), logger.error(chalk.red(rsDate.message)), process.exit(1);
         else if (rsEmployee instanceof Error) 
             spinner.stop(), logger.error(chalk.red(rsEmployee.message)), process.exit(1);
-        else if (rsDate) emailList.push(email);
+        else if (rsDate) {
+            switch(rsEmployee) {
+                case exchanged.SENT:
+                    sent += 1;
+                    break;
+                case exchanged.received:
+                    received += 1;
+                    break;
+                default:
+                    break;
+            }
+        }
     }, () => {
         spinner.stop();
-        process.stdout.write(emailList.toString());
+
+        tb.push([
+            options.employee, 
+            options.dateFrom || ''   + ' - ' + options.dateTo || '',
+            sent,
+            received,
+            sent + received
+        ]);
+        process.stdout.write(tb.toString());
     }, path => {
         spinner.stop();
         logger.error(chalk.red(ErrMsg.IO_PERMISSION_DENIED(path)));
