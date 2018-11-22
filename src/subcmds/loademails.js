@@ -124,14 +124,15 @@ const action = (args, options, logger) => {
 
     FileWalker(args.dir, (err, absPath, data) => {
         if (err) return logger.error(chalk.red(ErrMsg.IO_FAILED_TO_READ(absPath)));
+
         const emailParser = new EmailParser(data);
         const email = emailParser.parseAndCreateEmail();
         
-        if (checkDateInRange(email, options, logger)) {
-            emailList.push(email);
-        }
+        if (checkDateInRange(email, options, logger)) emailList.push(email);
     }, () => {
         process.stdout.write(emailList.toString());
+    }, path => {
+        logger.error(chalk.red(ErrMsg.IO_PERMISSION_DENIED(path)));
     });
 };
 
