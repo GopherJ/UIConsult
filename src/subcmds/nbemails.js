@@ -191,14 +191,16 @@ const action = (args, options, logger) => {
         }
     }, () => {
         spinner.stop();
+        console.log(sent, received)
 
         tb.push([
             options.employee, 
-            options.dateFrom || ''   + ' - ' + options.dateTo || '',
-            sent,
-            received,
-            sent + received
+            (options.dateFrom || '')  + ' - ' + (options.dateTo || ''),
+            sent.toString(),
+            received.toString(),
+            (sent + received).toString()
         ]);
+
         process.stdout.write(tb.toString());
     }, path => {
         spinner.stop();
