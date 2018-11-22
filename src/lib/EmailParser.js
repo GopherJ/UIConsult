@@ -1,4 +1,5 @@
 const Email = require('./Email');
+const { isNull } = require('../utils');
 
 /**
  * Email Parser
@@ -34,7 +35,10 @@ class EmailParser {
 
     parseId() {
         const re = /^Message-ID: ?<(.*)>/m;
-        this._id = this._mailText.match(re)[1];
+        const matches = this._mailText.match(re);
+
+        if (!isNull(matches))
+            this._id = matches.slice(1).pop();
 
         return this;
     }
@@ -55,12 +59,11 @@ class EmailParser {
             'Dec': 12
         };
 
-        // Todo: Tue, 1 Jan
-        const re = /^Date: ?(Mon|Tue|Wed|Thu|Fri|Sat|Sun), ([0-9]{1,2}) (Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec) ([0-9]{4}) ([0-9]{2}):([0-9]{2}):([0-9]{2})/m;
+        const re = /^Date: ?(?:Mon|Tue|Wed|Thu|Fri|Sat|Sun), ([0-9]{1,2}) (Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec) ([0-9]{4}) ([0-9]{2}):([0-9]{2}):([0-9]{2})/m;
         const matches = this._mailText.match(re);
-        if (matches !== null) {
+
+        if (!isNull(matches)) {
             let [
-                _,
                 d,
                 m,
                 y,
@@ -80,21 +83,30 @@ class EmailParser {
 
     parseSubject() {
         const re = /^Subject: ?(.*)/m;
-        this._subject = this._mailText.match(re)[1];
+        const matches = this._mailText.match(re);
+
+        if (!isNull(matches))
+            this._subject = matches.slice(1).pop();
 
         return this;
     }
 
     parseContent() {
         const re = /[\s\S]*\n\n([\s\S]*)/;
-        this._content = this._mailText.match(re)[1];
+        const matches = this._mailText.match(re);
+
+        if (!isNull(matches))
+            this._content = matches.slice(1).pop();
 
         return this;
     }
 
     parseSender() {
         const re = /^From: ?(.*)/m;
-        this._sender = this._mailText.match(re)[1];
+        const matches = this._mailText.match(re);
+        
+        if (!isNull(matches))
+            this._sender = matches.slice(1).pop();
 
         return this;
     }

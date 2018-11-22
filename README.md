@@ -57,6 +57,7 @@ The executable will be named as `uic`.
 1. `uic --help, -h`                               :           display help information
 2. `uic --version, -V`                            :           display version
 3. `uic --date-from, --date-to, -s, -e`           :           specify period of time. e.g. '-s="2018"'
+4.
 ....
 
 
