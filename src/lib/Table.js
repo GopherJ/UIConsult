@@ -1,4 +1,4 @@
-const Table = require('cli-table3');
+const table = require('cli-table3');
 const os = require('os');
 const { execSync } = require('child_process');
 
@@ -17,7 +17,7 @@ class Table {
         this.updateCols();
 
         if (isAll(head, isString)) {
-            this.tb = new Table({
+            this.tb = new table({
                 head,
                 colWidths: [1/6, 1/6, 1/6, 1/6, 1/6].map(x => Math.floor(x * this.cols))
             });
@@ -53,7 +53,7 @@ class Table {
         return this;
     }
 
-    pushRow(row) {
+    push(row) {
         if (isAll(row, isString)) this.tb.push(row);
         return this;
     }
@@ -62,3 +62,5 @@ class Table {
         return this.tb.toString();
     }
 }
+
+module.exports = Table;
