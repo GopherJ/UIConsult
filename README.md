@@ -50,33 +50,24 @@ And you need also to learn `mocha` and `chai` so that you can write unit test
     ```
 
 
-### API design[exprimental]
+### Current API
 
 The executable will be named as `uic`.
 
 1. `uic --help, -h`                               :           display help information
 2. `uic --version, -V`                            :           display version
-3. `uic --date-from, --date-to, -df, -dt`         :           specify period of time, e.g.`2018-10-05 11:40:20`, by default it's included
-4. `uic --employee, -e`                           :           specify empolyee name
-5. `uic --out-dir`                                :           specify where the svg/png file should be put in
-6. `uic --output-format`                          :           specify which format should be used (svg/png)    
+3. `uic --date-from, --date-to, -s, -e`           :           specify period of time. e.g. '-s="2018"'
 ....
 
 
 
 ### Build && Compile && Test
 
-`bundle this project`
-
-```bash
-npm run build
-```
-
 `compile to generate an executable`
 
 ```bash
-npm run compile
-# it will generate executables for linux, win and  macos. See the executable in bin
+npm run build
+# it will generate executables for linux, win and  macos. See the executable in ./bin
 ```
 
 `unit test`
@@ -84,7 +75,6 @@ npm run compile
 ```bash
 npm run test
 # now there is no test
-
 ```
 
 
