@@ -27,10 +27,12 @@ const command = {
     description: 'Load emails of specific period'
 };
 
-const argument = {
-    var: '<dir>',
-    description: 'Directory where store emails'
-};
+const arguments = [
+    {
+        var: '<dir>',
+        description: 'Directory where store emails'
+    }
+];
 
 const options = {
     dateFrom: {
@@ -131,7 +133,7 @@ const action = (args, options, logger) => {
 module.exports = {
     alias,
     command,
-    argument,
+    arguments,
     options,
     action
 };

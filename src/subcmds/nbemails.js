@@ -1,6 +1,7 @@
 /**
  * SPEC_2
  */
+
 const cli = require('caporal');
 const chalk = require('chalk');
 const ora = require('ora');
@@ -34,10 +35,15 @@ const command = {
     description: "Show an employee's exchanged emails' statistics of specific period"
 };
 
-const argument = {
-    var: '<dir>',
-    description: 'Directory where store emails'
-};
+const arguments = [
+    {
+        var: '<dir>',
+        description: 'Directory where store emails'
+    }, {
+        var: '<employee>',
+        description: "Employee's fullname"
+    }
+];
 
 const options = {
     dateFrom: {
@@ -210,7 +216,7 @@ const action = (args, options, logger) => {
 module.exports = {
     alias,
     command,
-    argument,
+    arguments,
     options,
     action
 };
