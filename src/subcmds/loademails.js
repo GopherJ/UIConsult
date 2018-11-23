@@ -36,12 +36,12 @@ const arguments = [
 
 const options = {
     dateFrom: {
-        var: '-f, --date-from',
+        var: '-s, --date-from',
         description: 'Start date',
         type: cli.STRING
     },
     dateTo: {
-        var: '-t, --date-to',
+        var: '-e, --date-to',
         description: 'End date',
         type: cli.STRING
     }
