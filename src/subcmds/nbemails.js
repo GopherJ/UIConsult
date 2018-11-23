@@ -35,15 +35,16 @@ const command = {
     description: "Show an employee's exchanged emails' statistics of specific period"
 };
 
-const arguments = [
-    {
+const arguments = {
+    dir: {
         var: '<dir>',
         description: 'Directory where store emails'
-    }, {
+    }, 
+    employee: {
         var: '<employee>',
         description: "Employee's fullname"
     }
-];
+};
 
 const options = {
     dateFrom: {
@@ -150,7 +151,7 @@ const checkEmployeeName = (email, args) => {
         else 
             return exchanged.NONE;
     } else {
-        return new Error(ErrMsg.OPTION_INVALID_FORMAT(options.employee.var));
+        return new Error(ErrMsg.OPTION_INVALID_FORMAT(arguments.employee.var));
     }
 };
 
