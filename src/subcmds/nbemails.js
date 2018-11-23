@@ -55,11 +55,6 @@ const options = {
         var: '-e, --date-to',
         description: 'End date',
         type: cli.STRING
-    },
-    employee: {
-        var: '-E, --employee',
-        description: "Employee's fullname",
-        type: cli.STRING
     }
 };
 
@@ -125,25 +120,28 @@ const checkDateInRange = (email, options) => {
 };
 
 const testName = (firstName, lastName, emailAddr) => {
-        const ref = new RegExp(firstName, 'i');
-        const rel = new RegExp(lastName, 'i');
+    const [
+        firstNameUpper,
+        lastNameUpper,
+        emailAddrUpper
+    ] = [firstName, lastName, emailAddr].map(x => x.toUpperCase());
 
-        if (ref.test(emailAddr) && rel.test(emailAddr)) return true;
-        return false;
+    return emailAddrUpper.includes(firstNameUpper)
+        && emailAddrUpper.includes(lastNameUpper);
 };
 
-const checkEmployeeName = (email, options) => {
-    const { employee } = options;
+const checkEmployeeName = (email, args) => {
+    const { employee } = args;
     const { sender, receivers } = email;
 
     const re = /^(\w+)(?: +)(\w+)$/;
     const matches = employee.match(re);
 
     if (!isNull(matches)) {
-        const {
+        const [
             firstName,
             lastName
-        } = matches.slice(1);
+        ] = matches.slice(1);
 
         if (testName(firstName, lastName, sender)) 
             return exchanged.SENT;
@@ -177,7 +175,7 @@ const action = (args, options, logger) => {
         const email = emailParser.parseAndCreateEmail();
 
         const rsDate = checkDateInRange(email, options);
-        const rsEmployee = checkEmployeeName(email, options);
+        const rsEmployee = checkEmployeeName(email, args);
 
         if (rsDate instanceof Error) 
             spinner.stop(), logger.error(chalk.red(rsDate.message)), process.exit(1);
@@ -199,7 +197,7 @@ const action = (args, options, logger) => {
         spinner.stop();
 
         tb.push([
-            options.employee, 
+            args.employee, 
             (options.dateFrom || '')  + ' - ' + (options.dateTo || ''),
             sent.toString(),
             received.toString(),
