@@ -27,7 +27,7 @@ subcmds.forEach(subcmd => {
     if(isArrayAndHasLength(valuesArg))
         valuesArg.forEach(arg => cmd.argument(arg.var, arg.description));
     if (isArrayAndHasLength(valuesOpt)) 
-        valuesOpt.forEach(opt => cmd.opt(opt.var, opt.description, opt.type, opt.default));
+        valuesOpt.forEach(opt => cmd.option(opt.var, opt.description, opt.type, opt.default));
 
     cmd.action(action);
 });
