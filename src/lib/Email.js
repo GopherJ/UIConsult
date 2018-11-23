@@ -2,7 +2,8 @@
  * Single Email
  */
 class Email {
-    constructor(sender, receivers, ccreceivers, bccreceivers, subject, date, content) {
+    constructor(id, sender, receivers, ccreceivers, bccreceivers, subject, date, content) {
+        this.id = id;
         this.sender = sender;
         this.receivers = receivers;
         this.ccreceivers = ccreceivers;

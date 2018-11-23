@@ -164,6 +164,7 @@ class EmailParser {
             .parseBccReceivers();
 
         this._parsedEmail = new Email(
+            this._id,
             this._sender,
             this._receivers,
             this._ccreceivers,
