@@ -11,6 +11,9 @@ dist/
 # Jetbrains
 .idea/
 
+# Vscode
+.vscode/
+
 # executables
 bin/
 
