@@ -24,7 +24,7 @@ subcmds.forEach(subcmd => {
     const cmd = cli.command(command.name, command.description);
 
     if (isString(alias)) cmd.alias(alias);
-    if(isArrayAndHasLength(valuesArg))
+    if (isArrayAndHasLength(valuesArg))
         valuesArg.forEach(arg => cmd.argument(arg.var, arg.description));
     if (isArrayAndHasLength(valuesOpt)) 
         valuesOpt.forEach(opt => cmd.option(opt.var, opt.description, opt.type, opt.default));
