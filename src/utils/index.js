@@ -23,7 +23,8 @@ const isInRange = (arr, n)=> isArray(arr)
     && n >= arr[0] 
     && n <= arr[1];
 const lastDayOfMonth = (m, y) => new Date(y, m, 0).getDate();
-const formatDate = d => dayjs(d).format('YYYY-MM-DD HH:mm:ss');
+const formatDate = d => dayjs(d).format('YYYY-MMDD HH:mm:ss');
+const makeArray = (s, i) => new Array(s).fill(i);
 
 module.exports = {
     isString,
@@ -40,5 +41,6 @@ module.exports = {
     isAllFuntion,
     isInRange,
     lastDayOfMonth,
-    formatDate
+    formatDate,
+    makeArray
 };
