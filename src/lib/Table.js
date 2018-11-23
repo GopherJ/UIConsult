@@ -1,27 +1,27 @@
+/*
+ * Table
+ *
+ * @Author: Cheng JIANG
+ * @Date: 2018-11-23 12:11:54
+ * @Last Modified by: Cheng JIANG
+ * @Last Modified time: 2018-11-23 12:44:15
+ */
+
 const table = require('cli-table3');
 const os = require('os');
+
 const { execSync } = require('child_process');
 
 const {
     isAll,
-    isString
+    isString,
+    isNull,
+    makeArray
 } = require('../utils');
 
-/**
- * Table
- */
 class Table {
     constructor(head) {
-        this.cols = 80;
-
-        this.updateCols();
-
-        if (isAll(head, isString)) {
-            this.tb = new table({
-                head,
-                colWidths: [1/6, 1/6, 1/6, 1/6, 1/6].map(x => Math.floor(x * this.cols))
-            });
-        }
+        this.updateHead(head);
     }
 
     updateCols() {
@@ -33,7 +33,7 @@ class Table {
         case 'win32':
             const rs = execSync('mode con | findStr Columns').toString('utf8');
             const numMatches = rs.match(/(\d+)/);
-            if (numMatches !== null) this.cols = +numMatches.slice(1).pop();
+            if (!isNull(numMatches)) this.cols = +numMatches.slice(1).pop();
             break;
         }
 
@@ -41,14 +41,13 @@ class Table {
     }
 
     updateHead(head) {
-        if (isAll(head, isString)) {
-            this.updateCols();
+        if (!isAll(head, isString)) return this;
 
-            this.tb = new Table({
-                head,
-                colWidths: [1/6, 1/6, 1/6, 1/6, 1/6].map(x => Math.floor(x * this.cols))
-            });
-        }
+        this.updateCols(), this.tb = new table({
+            head,
+            colWidths: makeArray(head.length,  1 / (head.length + 1))
+                .map(x => Math.floor(x * this.cols))
+        });
 
         return this;
     }
