@@ -1,10 +1,11 @@
 /**
- *  utils
+ *  util functions
+ * 
  */
 const dayjs = require('dayjs');
 
 const isString = s => typeof s === 'string';
-const isEmptyString = s => s === '';
+const isEmptyString = s => isString(s) && s === '';
 const isNull = n => n === null;
 const isUndefined = n => n === undefined;
 const isArray = arr => Array.isArray(arr);
