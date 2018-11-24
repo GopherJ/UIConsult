@@ -26,6 +26,27 @@ const isInRange = (arr, n)=> isArray(arr)
 const lastDayOfMonth = (m, y) => new Date(y, m, 0).getDate();
 const formatDate = d => dayjs(d).format('YYYY-MMDD HH:mm:ss');
 const makeArray = (s, i) => new Array(s).fill(i);
+const getHour = e =>  {
+    let date = String(e.date);
+    //get hour in a mail in the hh:mm format
+    const re = /(?<=\s)[0-9]{2}:[0-9]{2}/;
+    return date.match(re)[0];
+}
+const getTodaysDate = e =>
+{
+    let date = String(e.date);
+    let re = /[\w]{3}\s[\w]{3}\s[0-9]{2}\s[0-9]{4}/;
+    return date.match(re)[0];
+    
+}
+const sortDescending = (a,b) => {
+        if (a[1] === b[1]) {
+            return 0;
+        }
+        else {
+            return (a[1] > b[1]) ? -1 : 1;
+        }
+}
 
 module.exports = {
     isString,
@@ -43,5 +64,8 @@ module.exports = {
     isInRange,
     lastDayOfMonth,
     formatDate,
-    makeArray
+    makeArray,
+    getHour,
+    getTodaysDate,
+    sortDescending
 };
