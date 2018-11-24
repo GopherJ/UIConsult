@@ -2,7 +2,7 @@
  * @Author: Cheng JIANG 
  * @Date: 2018-11-24 15:29:35 
  * @Last Modified by: Cheng JIANG
- * @Last Modified time: 2018-11-24 15:59:23
+ * @Last Modified time: 2018-11-24 16:09:29
  */
 const cli = require('caporal');
 const chalk = require('chalk');
@@ -25,7 +25,7 @@ const {
 } = require('../utils');
 
 /**
- * state for describing it's an email sent or received to an employee
+ * state for describing that it's an email sent or received by an employee
  */
 const exchanged = {
     SENT: Symbol(),
@@ -69,9 +69,9 @@ const options = {
  * parse date string
  * 
  * e.g. '2018', '1/12/2018', '12/2018', '01/12/2018' will be valid date string,
- * it will receive an instance of `Date`
+ * it will return an instance of `Date`
  * 
- * however, it will return an instance of `Error` with an explication,
+ * otherwise, it will return an instance of `Error` with an explication,
  * e.g. '1/13/2018'  => Out Of Range
  *      '30/02/2018' => Out Of Range
  *      'abc'        => Invalid Format
@@ -88,7 +88,7 @@ const parseDate = (dateStr, isDateFrom) => {
     const matches = dateStr.match(re);
     const VAR = isDateFrom ? options.dateFrom.var : options.dateTo.var;
 
-    // e.g '20199' 'sdls' '123'
+    // matches correctly the regexp
     if (!isNull(matches)) {
         const [
             d,
@@ -145,13 +145,13 @@ const checkDateInRange = (email, options) => {
     // no range specified
     if (isUndefined(dateFrom) && isUndefined(dateTo)) {
         return true;
-    // end date if specified
+    // end date is specified
     } else if (isUndefined(dateTo)) {
         const rs = parseDate(dateFrom, true);
 
         // parsing error
         if (rs instanceof Error) return rs;
-        // email's date is out of range of options' date range
+        // email's date is out of range
         if(rs > date) return false;
         return true;
     // start date is specified
@@ -160,7 +160,7 @@ const checkDateInRange = (email, options) => {
 
         // parsing error
         if (rs instanceof Error) return rs;
-        // email's date is out of range of options' date range
+        // email's date is out of range
         if(rs < date) return false;
         return true;
     }
@@ -173,7 +173,7 @@ const checkDateInRange = (email, options) => {
     if (rsFrom instanceof Error) return rsFrom;
     if (rsTo instanceof Error) return rsTo
 
-    // email's date is out of range of options' date range
+    // email's date is out of range
     if (rsFrom > date || rsTo < date) return false;
     return true;
 };
@@ -206,9 +206,15 @@ const testName = (firstName, lastName, emailAddr) => {
  * check if employee's name (parsed from caporal argument) is included
  * in an email's address.
  * 
- * if it's included in sender, then this function return 'exchanged.SENT'
- * if it's included in some receiver's email address, then this function return 'exchanged.RECEIVED'
- * otherwise, this function return 'exchanged.NONE'
+ * the employee's name must be separated by one or more spaces
+ * e.g. 'cheng jiang', 'cheng        jiang' are valid
+ * 
+ * however
+ *  'cheng', 'jiang' are not valid, maybe later I can add support for this
+ * 
+ * if it's included in sender, then this function returns 'exchanged.SENT'
+ * if it's included in some receiver's email address, then this function returns 'exchanged.RECEIVED'
+ * otherwise, this function returns 'exchanged.NONE'
  * 
  * @param {Email} email 
  * @param {Caporal.arguments} args 
@@ -221,6 +227,7 @@ const checkEmployeeName = (email, args) => {
     const re = /^(\w+)(?: +)(\w+)$/;
     const matches = employee.match(re);
 
+    // e.g 'cheng jiang'
     if (!isNull(matches)) {
         const [
             firstName,
@@ -234,6 +241,7 @@ const checkEmployeeName = (email, args) => {
         else 
             return exchanged.NONE;
     } else {
+        // e.g. 'slkdjlsd'
         return new Error(ErrMsg.OPTION_INVALID_FORMAT(arguments.employee.var));
     }
 };
