@@ -278,9 +278,8 @@ const action = (args, options, logger) => {
     // to init a correct table
     const tb = new Table([
         'Employee Name',
-        'Time Period',
         'Days',
-        'Sent Emails',
+        'Sent Emails'
     ]);
 
     // start to read file recursively
@@ -345,11 +344,9 @@ const action = (args, options, logger) => {
         {
             tb.push([
                 args.employee, 
-                (options.dateFrom || '')  + ' - ' + (options.dateTo || ''),
                 buzzyDaysArrays[i][0].toString(),
-                buzzyDaysArrays[i][1].toString(),
-                (sent + received).toString()
-            ]);
+                buzzyDaysArrays[i][1].toString()
+                        ]);
             i++;
         }
 
