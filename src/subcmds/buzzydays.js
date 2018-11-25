@@ -277,7 +277,7 @@ const action = (args, options, logger) => {
     // create table, detect terminal's width and use the width and table head
     // to init a correct table
     const tb = new Table([
-        'Employee Name',
+        'Rank',
         'Days',
         'Sent Emails'
     ]);
@@ -343,7 +343,7 @@ const action = (args, options, logger) => {
         while(i < buzzyDaysArrays.length && i < 10)
         {
             tb.push([
-                args.employee, 
+                (i+1).toString(),
                 buzzyDaysArrays[i][0].toString(),
                 buzzyDaysArrays[i][1].toString()
                         ]);
