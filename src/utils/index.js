@@ -48,6 +48,33 @@ const sortDescending = (a,b) => {
         }
 }
 
+const arrayOfReceiversName = e => { 
+    let test = /^.*(?=(\@))/;
+    let str = e.receivers.toString();
+    let affichage = str.split(',');
+    for(let i = 0; i < affichage.length ;i++)
+    {
+        if(!isNull(affichage[i].match(test)))
+        {
+            affichage[i] = affichage[i].match(test)[0];
+        }
+
+    }
+    return affichage;
+}
+const senderName = e => {
+    let test = /^.*(?=(\@))/;
+    return e.sender.match(test)[0];    
+}
+const sortDescendingTopContact =(a,b) =>
+{
+    if (a[3] === b[3]) {
+        return 0;
+    }
+    else {
+        return (a[3] > b[3]) ? -1 : 1;
+    }
+}
 module.exports = {
     isString,
     isEmptyString,
@@ -67,5 +94,8 @@ module.exports = {
     makeArray,
     getHour,
     getTodaysDate,
-    sortDescending
+    sortDescending,
+    arrayOfReceiversName,
+    senderName,
+    sortDescendingTopContact
 };
