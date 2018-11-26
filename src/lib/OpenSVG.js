@@ -10,10 +10,10 @@ const { spawn } = require('child_process');
 
 const OpenSVG = path => {
     switch (os.platform()) {
-    case 'linux':
+    case 'darwin':
         spawn('start', [path]);
         break;
-    case 'darwin':
+    case 'linux':
         spawn('xdg-open', [path]);
         break;
     case 'win32':
