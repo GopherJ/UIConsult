@@ -1,0 +1,16 @@
+{
+  "data": {"values":[{"date":"2000-1","email":363},{"date":"2000-2","email":5},{"date":"2000-3","email":30},{"date":"2000-4","email":17},{"date":"2000-5","email":27},{"date":"2000-6","email":21},{"date":"2000-7","email":54},{"date":"2000-8","email":128},{"date":"2000-9","email":118},{"date":"2000-10","email":107},{"date":"2000-11","email":75},{"date":"2000-12","email":173}]},
+  "mark": "line",
+  "encoding": {
+    "x": {
+      "timeUnit": "date",
+      "field": "date",
+      "type": "temporal"
+    },
+    "y": {
+      "aggregate": "mean",
+      "field": "email",
+      "type": "quantitative"
+    }
+  }
+}
