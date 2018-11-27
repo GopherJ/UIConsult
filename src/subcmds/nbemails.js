@@ -2,7 +2,7 @@
  * @Author: Cheng JIANG 
  * @Date: 2018-11-24 15:29:35 
  * @Last Modified by: Cheng JIANG
- * @Last Modified time: 2018-11-27 17:48:15
+ * @Last Modified time: 2018-11-27 23:05:40
  */
 const cli = require('caporal');
 const chalk = require('chalk');
@@ -195,10 +195,10 @@ const testName = (firstName, lastName, emailAddr) => {
         firstNameUpper,
         lastNameUpper,
         emailAddrUpper
-    ] = [firstName, lastName, emailAddr].map(x => x.toUpperCase());
+    ] = [firstName, lastName, emailAddr.replace(/@.*$/, '')]
+    .map(x => x.toUpperCase());
 
-    return emailAddrUpper.includes(firstNameUpper)
-        && emailAddrUpper.includes(lastNameUpper);
+    return `${firstNameUpper}.${lastNameUpper}` === emailAddrUpper;
 };
 
 /**
@@ -224,15 +224,15 @@ const checkEmployeeName = (email, args) => {
     const { employee } = args;
     const { sender, receivers } = email;
 
-    const re = /^(\w+)(?: +)(\w+)$/;
+    const re = /^\s*(?:(?:(\w+)(?:\s+)(\w+))|(?:(\w+)\.(\w+)@.+))\s*$/;
     const matches = employee.match(re);
 
-    // e.g 'cheng jiang'
+    // e.g 'cheng jiang' 'cheng.jiang@utt.fr' '  cheng  jiang  ' ' cheng.jiang@utt.fr '
     if (!isNull(matches)) {
         const [
             firstName,
             lastName
-        ] = matches.slice(1);
+        ] = matches.slice(1).filter(x => !isUndefined(x));
 
         if (testName(firstName, lastName, sender)) 
             return exchanged.SENT;
@@ -307,8 +307,8 @@ const action = (args, options, logger) => {
         // add a table row, every item must be string otherwise if fails to add
         // more info => Table.js
         tb.push([
-            args.employee, 
-            (options.dateFrom || '')  + ' - ' + (options.dateTo || ''),
+            args.employee.trim(),
+            (options.dateFrom || '').trim()  + ' - ' + (options.dateTo || '').trim(),
             sent.toString(),
             received.toString(),
             (sent + received).toString()
