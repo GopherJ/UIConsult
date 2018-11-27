@@ -4,7 +4,7 @@
     "description": "glo2 project in utt",
     "main": "dist/index.js",
     "scripts": {
-        "build": "cd scripts && ./build-release.sh",
+        "build": "cd scripts && node build.js",
         "test": "cd tests && ../node_modules/.bin/mocha ./**/*.js"
     },
     "keywords": [],
