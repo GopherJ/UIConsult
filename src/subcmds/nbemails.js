@@ -2,7 +2,7 @@
  * @Author: Cheng JIANG 
  * @Date: 2018-11-24 15:29:35 
  * @Last Modified by: Cheng JIANG
- * @Last Modified time: 2018-11-24 16:09:29
+ * @Last Modified time: 2018-11-27 17:48:15
  */
 const cli = require('caporal');
 const chalk = require('chalk');
@@ -84,7 +84,7 @@ const options = {
  * @return {Error|Date}
  */
 const parseDate = (dateStr, isDateFrom) => {
-    const re = /^(?:([0-9]{1,2})\/)?(?:([0-9]{1,2})\/)?(?:([0-9]{4}))$/;
+    const re = /^\s*(?:([0-9]{1,2})\/)?(?:([0-9]{1,2})\/)?(?:([0-9]{4}))\s*$/;
     const matches = dateStr.match(re);
     const VAR = isDateFrom ? options.dateFrom.var : options.dateTo.var;
 

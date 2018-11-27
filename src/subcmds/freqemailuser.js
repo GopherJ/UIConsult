@@ -100,7 +100,7 @@ const options = {
 
 
 const parseDate = (dateStr, isDateFrom) => {
-    const re = /^(?:([0-9]{1,2})\/)?(?:([0-9]{1,2})\/)?(?:([0-9]{4}))$/;
+    const re = /^\s*(?:([0-9]{1,2})\/)?(?:([0-9]{1,2})\/)?(?:([0-9]{4}))\s*$/;
     const matches = dateStr.match(re);
     const VAR = isDateFrom ? options.dateFrom.var : options.dateTo.var;
 
