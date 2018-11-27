@@ -5,7 +5,12 @@
 const cli = require('caporal');
 const chalk = require('chalk');
 const ora = require('ora');
+const fs = require('fs');
 
+var vg = require('vega');
+var vegalite = require('vega-lite');
+
+const OpenSVG = require('../lib/OpenSVG');
 const FileWalker = require('../lib/FileWalker');
 const EmailParser = require('../lib/EmailParser');
 const EmailList = require('../lib/EmailList');
@@ -19,36 +24,30 @@ var Y = [];
 const Z = [];
 
 const chart =   {  
-    "config":{  
-       "view":{  
-          "width":400,
-          "height":300
-       }
-    },
-    "data":{  
-       "values":[  
- 
-       ]
-    },
-    "mark":"circle",
-    "encoding":{  
-       "size":{  
-          "type":"quantitative",
-          "aggregate":"sum",
-          "field":"email"
-       },
-       "x":{  
-          "type":"ordinal",
-          "field":"date",
-          "timeUnit":"hours"
-       },
-       "y":{  
-          "type":"ordinal",
-          "field":"date",
-          "timeUnit":"day"
-       }
-    }
- }
+        "data":{  
+           "values":[  
+     
+           ]
+        },
+        "mark":"circle",
+        "encoding":{  
+           "size":{  
+              "type":"quantitative",
+              "aggregate":"sum",
+              "field":"email"
+           },
+           "x":{  
+              "type":"ordinal",
+              "field":"date",
+              "timeUnit":"hours"
+           },
+           "y":{  
+              "type":"ordinal",
+              "field":"date",
+              "timeUnit":"day"
+           }
+        }
+     }
 
 const { 
     isInRange, 
@@ -300,11 +299,19 @@ const action = (args, options, logger) => {
         spinner.stop();
 
        chart['data']['values'] = donnees;
-       Json = JSON.stringify(chart);      
-
-       const fs = require("fs");
-       fs.writeFileSync("MyChart", Json, "UTF-8");
        
+       
+       const myChart = vegalite.compile(chart, {config: {background: "white"}}).spec;
+
+       /* SVG version */
+       var runtime = vg.parse(myChart);
+       var view = new vg.View(runtime).renderer('svg').run();
+       var mySvg = view.toSVG();
+       mySvg.then(function(res){
+           fs.writeFileSync("./result.svg", res)
+           view.finalize();
+           OpenSVG('./result.svg')
+       });
 
     }, path => {
         spinner.stop();

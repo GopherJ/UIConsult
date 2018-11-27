@@ -5,6 +5,12 @@
 const cli = require('caporal');
 const chalk = require('chalk');
 const ora = require('ora');
+const fs = require('fs');
+
+var vg = require('vega');
+var vegalite = require('vega-lite');
+
+const OpenSVG = require('../lib/OpenSVG');
 
 const FileWalker = require('../lib/FileWalker');
 const EmailParser = require('../lib/EmailParser');
@@ -34,6 +40,7 @@ var chartDay = {
     }
   };
 
+
   var chartMonth = {
     "data": {"values":[]},
     "mark": "line",
@@ -49,7 +56,7 @@ var chartDay = {
         "type": "quantitative"
       }
     }
-  }
+  };
 
 const { 
     isInRange, 
@@ -251,17 +258,37 @@ const action = (args, options, logger) => {
         chartDay['data']['values'] = donnees;
         Json = JSON.stringify(chartDay);      
  
-        const fs = require("fs");
-        fs.writeFileSync("monFichier", Json, "UTF-8");
+        const myChart = vegalite.compile(chartDay, {config: {background: "white"}}).spec;
+
+        /* SVG version */
+        var runtime = vg.parse(myChart);
+        var view = new vg.View(runtime).renderer('svg').run();
+        var mySvg = view.toSVG();
+        mySvg.then(function(res){
+            fs.writeFileSync("./result.svg", res)
+            view.finalize();
+            OpenSVG('./result.svg')
+        });
+
         }
         else if(options.dom === 'm'){
         chartMonth['data']['values'] = donnees;
         Json = JSON.stringify(chartMonth);      
- 
-        const fs = require("fs");
-        fs.writeFileSync("MyChart", Json, "UTF-8");
+        
+        const myChart = vegalite.compile(chartMonth, {config: {background: "white"}}).spec;
+
+        /* SVG version */
+        var runtime = vg.parse(myChart);
+        var view = new vg.View(runtime).renderer('svg').run();
+        var mySvg = view.toSVG();
+        mySvg.then(function(res){
+            fs.writeFileSync("./result.svg", res)
+            view.finalize();
+            OpenSVG('./result.svg')
+        });
+
         }
-        console.log(donnees);
+        //console.log(donnees);
        
     }, path => {
         spinner.stop();     
