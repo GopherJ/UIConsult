@@ -1,8 +1,10 @@
 /*
+ * walk and read files recursivly
+ *
  * @Author: Cheng JIANG 
  * @Date: 2018-11-23 12:47:22 
- * @Last Modified by:   Cheng JIANG 
- * @Last Modified time: 2018-11-23 12:47:22 
+ * @Last Modified by: Cheng JIANG
+ * @Last Modified time: 2018-11-27 22:30:51
  */
 
 const fs = require('fs');

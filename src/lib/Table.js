@@ -4,7 +4,7 @@
  * @Author: Cheng JIANG
  * @Date: 2018-11-23 12:11:54
  * @Last Modified by: Cheng JIANG
- * @Last Modified time: 2018-11-23 12:44:15
+ * @Last Modified time: 2018-11-27 22:29:27
  */
 
 const table = require('cli-table3');
@@ -54,6 +54,7 @@ class Table {
 
     push(row) {
         if (isAll(row, isString)) this.tb.push(row);
+
         return this;
     }
 

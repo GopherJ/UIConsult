@@ -1,6 +1,12 @@
-/**
- *  Email List
+/*
+ * Email list
+ *
+ * @Author: Cheng JIANG 
+ * @Date: 2018-11-27 22:33:47 
+ * @Last Modified by:   Cheng JIANG 
+ * @Last Modified time: 2018-11-27 22:33:47 
  */
+
 const Email = require('./Email');
 const Table = require('./Table');
 

@@ -6,6 +6,7 @@
  */
 
 const os = require('os');
+
 const { spawn } = require('child_process');
 
 const OpenSVG = path => {
@@ -20,7 +21,6 @@ const OpenSVG = path => {
         spawn('cmd.exe', ['/c', 'start', path]);
         break;
     }
-
 };
 
 module.exports = OpenSVG; 

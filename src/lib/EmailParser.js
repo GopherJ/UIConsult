@@ -1,4 +1,14 @@
+/*
+ * parse plain text emails and generate {Email}
+ *
+ * @Author: Cheng JIANG 
+ * @Date: 2018-11-27 22:31:10 
+ * @Last Modified by: Cheng JIANG
+ * @Last Modified time: 2018-11-27 22:32:51
+ */
+
 const Email = require('./Email');
+
 const { isNull } = require('../utils');
 
 /**
@@ -27,6 +37,7 @@ const { isNull } = require('../utils');
  * teams response to the submittal of annual cetifications.  It also covers
  * roles and responsiblities for the entire air compliance program.
  */
+
 class EmailParser {
     constructor(mailText) {
         this._isMigrated = false;
@@ -112,6 +123,7 @@ class EmailParser {
     }
 
     parseReceivers() {
+        // ToDo: this is not a good and effecient regexp
         const re = /(?:To: ?)((?:(?:[^<>()\[\]\\.,;:\s@"]+(?:\.[^<>()\[\]\\.,;:\s@"]+)*)|(?:".+"))@(?:(?:\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(?:(?:[a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))[,\t\n ]*)*/;
         const matches = this._mailText.match(re);
         const hasReceivers = matches !== null;
@@ -126,6 +138,7 @@ class EmailParser {
     }
 
     parseCcReceivers() {
+        // ToDo: this is not a good and effecient regexp
         const re = /(?:Cc: ?)((?:(?:[^<>()\[\]\\.,;:\s@"]+(?:\.[^<>()\[\]\\.,;:\s@"]+)*)|(?:".+"))@(?:(?:\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(?:(?:[a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))[,\t\n ]*)*/;
         const matches = this._mailText.match(re);
         const hasCcReceivers = matches !== null;
@@ -140,6 +153,7 @@ class EmailParser {
     }
 
     parseBccReceivers() {
+        // ToDo: this is not a good and effecient regexp
         const re = /(?:Bcc: ?)((?:(?:[^<>()\[\]\\.,;:\s@"]+(?:\.[^<>()\[\]\\.,;:\s@"]+)*)|(?:".+"))@(?:(?:\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(?:(?:[a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))[,\t\n ]*)*/;
         const matches = this._mailText.match(re);
         const hasBccReceivers = matches !== null;
