@@ -1,8 +1,5 @@
-/*
- * @Author: Cheng JIANG 
- * @Date: 2018-11-24 15:29:35 
- * @Last Modified by: Cheng JIANG
- * @Last Modified time: 2018-11-27 17:47:32
+/**
+ * @author Cherchour Liece
  */
 const cli = require('caporal');
 const chalk = require('chalk');
