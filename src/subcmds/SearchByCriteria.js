@@ -10,8 +10,6 @@ const FileWalker = require('../lib/FileWalker');
 const EmailParser = require('../lib/EmailParser');
 const EmailList = require('../lib/EmailList');
 
-const Table = require('../lib/Table');
-
 const ErrMsg = require('../msg/ErrMsg');
 const InfoMsg = require('../msg/InfoMsg');
 
@@ -168,9 +166,6 @@ const action = (args, options, logger) => {
         var recievers = [];
         var content = '';
         
-        const tb = new Table([
-            'Numbers of matching emails : ' + tmp.length
-        ]);
 
         if(options.wen ==="e"){
 
@@ -179,12 +174,15 @@ const action = (args, options, logger) => {
                 sender = Z[element].sender;
                 recievers = Z[element].receivers;
 
-                if(sender === options.param || (recievers.indexOf(options.param)) != -1 )
+                if(sender === options.param || (recievers.indexOf(options.param)) != -1 ){
                 tmp.push(Z[element]);
-                tb.push([
-                    Z[element].content
-                            ]);
+                emailList.push(Z[element]);    
+            }
              }
+             
+             spinner.stop();
+             process.stdout.write(emailList.toString());
+
 
         }else if (options.wen ==="n"){
             exp = options.param.split(' ')
@@ -199,35 +197,33 @@ const action = (args, options, logger) => {
 
                 if(sender.match(new RegExp(exp1, "i")) && sender.match(new RegExp(exp2, "i"))||matchRecievers(recievers, exp1, exp2) || content.match(new RegExp(exp1, "i")) && content.match(new RegExp(exp2, "i"))){
                     tmp.push(Z[element]);
-                    tb.push([
-                        Z[element].content
-                                ]);
+                    emailList.push(Z[element]);    
+
                  }
             }  
+            
+            spinner.stop();
+            process.stdout.write(emailList.toString());
 
         }else if (options.wen ==="w"){
+
             for (var element in Z){
+
             sender = Z[element].sender;
             recievers = Z[element].receivers;
             content = Z[element].content;
 
             if(sender.match(new RegExp(options.param, "i"))||matchRecievers(recievers, options.param, null) || content.match(new RegExp(options.param, "i"))){
+                
                 tmp.push(Z[element]);
-                tb.push([
-                    Z[element].content
-                            ]);
-             }
-            }         
+                emailList.push(Z[element]);
+            }
         }
+        
         spinner.stop();
+        process.stdout.write(emailList.toString());
 
-        process.stdout.write(tb.toString());
-
-       // process.stdout.write(tmp.toString());
-       // console.log(myTable);
-
-       // console.log(tmp.length);
-
+    }
     }, path => {
         spinner.stop();
         logger.error(chalk.red(ErrMsg.IO_PERMISSION_DENIED(path)));
@@ -239,7 +235,7 @@ const action = (args, options, logger) => {
 module.exports = {
     alias,
     command,
-    arguments,
+    arguments,  
     options,
     action
 };
