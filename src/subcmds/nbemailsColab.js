@@ -20,7 +20,6 @@ const ErrMsg = require('../msg/ErrMsg');
 const InfoMsg = require('../msg/InfoMsg');
 
 var X = [];
-var Y = [];
 const Z = [];
 
 var chartDay = {
@@ -256,7 +255,9 @@ const action = (args, options, logger) => {
         spinner.stop();
         if(options.dom === 'd'){
         chartDay['data']['values'] = donnees;
-        Json = JSON.stringify(chartDay);      
+        Json = JSON.stringify(chartDay);    
+        
+
  
         const myChart = vegalite.compile(chartDay, {config: {background: "white"}}).spec;
 
