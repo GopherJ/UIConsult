@@ -83,10 +83,15 @@ const options = {
         description: 'End date',
         type: cli.STRING
     },
-    noe: {
-        var: '-e, --noe',
-        description: 'user name or adresse',
-        type: cli.STRING
+    n:{
+        var: '-n, --name',
+        description: 'user name',
+        type: cli.BOOL
+    },
+    e:{
+        var: '-e, --email',
+        description: 'user adresse',
+        type: cli.BOOL
     },
     param: {
         var: '-e, --param',
@@ -136,10 +141,6 @@ const parseDate = (dateStr, isDateFrom) => {
     }
 };
 
-function splitString(stringToSplit, separator) {
-    return stringToSplit.toString().split(separator);
-  }
-  
 const checkDateInRange = (email, options) => {
     const { dateFrom, dateTo } = options;
     const { date } = email;
@@ -229,7 +230,7 @@ const action = (args, options, logger) => {
         var emaildate = 0;
         var sender = '';
         var donnees = [];
-        if(options.noe ==="e"){
+        if(options.email){
 
             for (var element in Z){
                
@@ -250,7 +251,7 @@ const action = (args, options, logger) => {
                 donnees = resultData(X);
 
 
-        }else if (options.noe ==="n"){
+        }else if (options.name){
             exp = options.param.split(' ')
             exp1 = exp[0];
             exp2 = exp[1];
