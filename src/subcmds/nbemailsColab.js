@@ -6,6 +6,8 @@ const cli = require('caporal');
 const chalk = require('chalk');
 const ora = require('ora');
 const fs = require('fs');
+const path = require('path');
+
 
 var vg = require('vega');
 var vegalite = require('vega-lite');
@@ -90,9 +92,19 @@ const options = {
         description: 'End date',
         type: cli.STRING
     },
-    dom: {
-        var: '-e, --dom',
-        description: 'date or month',
+    d: {
+        var: '-d, --day',
+        description: 'day or month',
+        type: cli.BOOL
+    },
+    m: {
+        var: '-m, --month',
+        description: 'day or month',
+        type: cli.BOOL
+    },
+    file: {
+        var: '-f, --file',
+        description: ' where the chart will be stored',
         type: cli.STRING
     }
 };
@@ -201,7 +213,6 @@ const monthsMap = {
 
 
 const action = (args, options, logger) => {
-    const emailList = new EmailList();
     const spinner = ora(InfoMsg.Loading).start();
 
     FileWalker(args.dir, (err, absPath, data) => {
@@ -214,10 +225,10 @@ const action = (args, options, logger) => {
         if (rs instanceof Error) spinner.stop(), logger.error(chalk.red(rs.message)), process.exit(1);
         else if (rs) Z.push(email);
     }, () => {
-       
+
         var tmp = [];
         var donnees = [];
-        if(options.dom ==="m"){
+        if(options.month){
             for (var element in Z){
                 var emaildate = Z[element].date;
                 tmp.push(emaildate);
@@ -233,7 +244,7 @@ const action = (args, options, logger) => {
 
             donnees = resultData(X);
 
-        }else if (options.dom ==="d"){
+        }else if (options.day){
             for (var element in Z){
                 var emaildate = Z[element].date;
                 tmp.push(emaildate);
@@ -253,7 +264,7 @@ const action = (args, options, logger) => {
  
         }
         spinner.stop();
-        if(options.dom === 'd'){
+        if(options.day){
         chartDay['data']['values'] = donnees;
         Json = JSON.stringify(chartDay);    
         
@@ -272,7 +283,7 @@ const action = (args, options, logger) => {
         });
 
         }
-        else if(options.dom === 'm'){
+        else if(options.month){
         chartMonth['data']['values'] = donnees;
         Json = JSON.stringify(chartMonth);      
         
@@ -283,20 +294,26 @@ const action = (args, options, logger) => {
         var view = new vg.View(runtime).renderer('svg').run();
         var mySvg = view.toSVG();
         mySvg.then(function(res){
-            fs.writeFileSync("./result.svg", res)
-            view.finalize();
-            OpenSVG('./result.svg')
+            const dir = path.dirname(options.file);
+            //  let filename = path.basename(options.path);
+    
+            //    const re = /\.svg$/;
+            //    if (!re.test(options.path)) {
+                    
+            //    }
+    
+               fs.existsSync(dir) || fs.mkdirSync(dir);
+               fs.writeFileSync(options.file, res);
+               view.finalize();
+               OpenSVG(options.file);
         });
 
         }
-        //console.log(donnees);
-       
+
     }, path => {
         spinner.stop();     
         logger.error(chalk.red(ErrMsg.IO_PERMISSION_DENIED(path)));
-
     });
-
 };
 
 module.exports = {

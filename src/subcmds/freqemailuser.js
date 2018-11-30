@@ -6,6 +6,7 @@ const cli = require('caporal');
 const chalk = require('chalk');
 const ora = require('ora');
 const fs = require('fs');
+const path = require('path');
 
 var vg = require('vega');
 var vegalite = require('vega-lite');
@@ -90,6 +91,11 @@ const options = {
     param: {
         var: '-e, --param',
         description: 'user name or adresse',
+        type: cli.STRING
+    },
+    file: {
+        var: '-f, --file',
+        description: 'path where the chart will be stored',
         type: cli.STRING
     }
 };
@@ -233,12 +239,6 @@ const action = (args, options, logger) => {
                 tmp.push(emaildate);
                
             }
-
-
-            tmp.sort(function(a, b) {
-                return a - b;
-              });
-
               
             for(var element in tmp){
                 const splt2 = (String(tmp[element]).split(' '));
@@ -278,8 +278,7 @@ const action = (args, options, logger) => {
         spinner.stop();
 
        chart['data']['values'] = donnees;
-       
-       
+    
        const myChart = vegalite.compile(chart, {config: {background: "white"}}).spec;
 
        /* SVG version */
@@ -287,9 +286,18 @@ const action = (args, options, logger) => {
        var view = new vg.View(runtime).renderer('svg').run();
        var mySvg = view.toSVG();
        mySvg.then(function(res){
-           fs.writeFileSync("./result.svg", res)
+           const dir = path.dirname(options.file);
+        //  let filename = path.basename(options.path);
+
+        //    const re = /\.svg$/;
+        //    if (!re.test(options.path)) {
+                
+        //    }
+
+           fs.existsSync(dir) || fs.mkdirSync(dir);
+           fs.writeFileSync(options.file, res);
            view.finalize();
-           OpenSVG('./result.svg')
+           OpenSVG(options.file);
        });
 
     }, path => {
