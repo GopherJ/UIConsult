@@ -138,12 +138,8 @@ if(c ==! null){
         return true;
         else return false;
     }
-
 }
-
 }
-
-
 
 const action = (args, options, logger) => {
     const emailList = new EmailList();
