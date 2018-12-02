@@ -4,6 +4,9 @@
  */
 const dayjs = require('dayjs');
 
+/**
+ * @author Cheng
+ */
 const isString = s => typeof s === 'string';
 const isEmptyString = s => isString(s) && s === '';
 const isNull = n => n === null;
@@ -24,14 +27,18 @@ const isInRange = (arr, n)=> isArray(arr)
     && n >= arr[0] 
     && n <= arr[1];
 const lastDayOfMonth = (m, y) => new Date(y, m, 0).getDate();
-const formatDate = d => dayjs(d).format('YYYY-MM-DD HH:mm:ss');
+const formatDateHour = d => dayjs(d).format('YYYY-MM-DD HH:mm:ss');
+const formatDate = d => dayjs(d).format('YYYY-MM-DD');
+const formatHour = d => dayjs(d).format('HH:mm:ss');
 const makeArray = (s, i) => new Array(s).fill(i);
-const getHour = e =>  {
-    let date = String(e.date);
-    //get hour in a mail in the hh:mm format
-    const re = /(?<=\s)[0-9]{2}:[0-9]{2}/;
-    return date.match(re)[0];
-}
+const descending = (a, b) => b < a ? -1 : b > a ? 1 : b >= a ? 0 : NaN;
+const descendingByProp = p => ((a, b) => b[p] < a[p] ? -1 : b[p] > a[p] ? 1 : b[p] >= a[p] ? 0 : NaN);
+const descendingByIdx = p => ((a, b) => b[p] < a[p] ? -1 : b[p] > a[p] ? 1 : b[p] >= a[p] ? 0 : NaN);
+const isOutsideWorkingHours = d => !(isDate(d) && d.getHours() > 8 && d.getHours() < 22);
+
+/**
+ * @author Liece 
+ */
 const getTodaysDate = e =>
 {
     let date = String(e.date);
@@ -40,6 +47,7 @@ const getTodaysDate = e =>
     
 }
 const sortDescending = (a,b) => {
+
         if (a[1] === b[1]) {
             return 0;
         }
@@ -62,10 +70,12 @@ const arrayOfReceiversName = e => {
     }
     return display;
 }
+
 const senderName = e => {
     let test = /^.*(?=(\@))/;
     return e.sender.match(test)[0];    
 }
+
 const sortDescendingTopContact =(a,b) =>
 {
     if (a[3] === b[3]) {
@@ -96,6 +106,7 @@ const ArrayOfUniqueWords= s => {
 }
     return "";
 }
+
 module.exports = {
     isString,
     isEmptyString,
@@ -110,14 +121,20 @@ module.exports = {
     isFunction,
     isAllFuntion,
     isInRange,
+    isOutsideWorkingHours,
     lastDayOfMonth,
+    formatDateHour,
     formatDate,
+    formatHour,
     makeArray,
-    getHour,
+    descending,
+    descendingByProp,
+    descendingByIdx,
+
     getTodaysDate,
     sortDescending,
     arrayOfReceiversName,
     senderName,
     sortDescendingTopContact,
-    ArrayOfUniqueWords
+    ArrayOfUniqueWords,
 };

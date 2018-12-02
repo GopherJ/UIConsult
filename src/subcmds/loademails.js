@@ -1,24 +1,20 @@
-/**
+/*
  * SPEC_1
+ *
+ * @Author: Cheng JIANG 
+ * @Date: 2018-12-02 13:37:42 
+ * @Last Modified by: Cheng JIANG
+ * @Last Modified time: 2018-12-02 13:38:04
  */
 const cli = require('caporal');
 const chalk = require('chalk');
 const ora = require('ora');
-
 const FileWalker = require('../lib/FileWalker');
 const EmailParser = require('../lib/EmailParser');
 const EmailList = require('../lib/EmailList');
-
 const ErrMsg = require('../msg/ErrMsg');
 const InfoMsg = require('../msg/InfoMsg');
-
-const { 
-    isInRange, 
-    isNull, 
-    isUndefined,
-    lastDayOfMonth, 
-    isNumber
-} = require('../utils');
+const checkDateRange = require('../utils/checkDateRange');
 
 const alias = 'lms';
 
@@ -47,68 +43,7 @@ const options = {
     }
 };
 
-const parseDate = (dateStr, isDateFrom) => {
-    const re = /^\s*(?:([0-9]{1,2})\/)?(?:([0-9]{1,2})\/)?(?:([0-9]{4}))\s*$/;
-    const matches = dateStr.match(re);
-    const VAR = isDateFrom ? options.dateFrom.var : options.dateTo.var;
-
-    if (!isNull(matches)) {
-        const [
-            d,
-            m,
-            y
-        ] = matches.slice(1).map(x => +x);
-
-        if (!isNumber(m) && !isNumber(d)) {
-            return new Date(y, 0);
-        } else if (!isNumber(m)) {
-            if (!isInRange([1, 12], d)) {
-                return new Error(ErrMsg.OPTION_OUT_OF_RANGE(VAR));
-            } else {
-                return new Date(y, d - 1, 0);
-            }
-        } else {
-            if (!isInRange([1, lastDayOfMonth(m, y)], d) || !isInRange([1, 12], m)) {
-                return new Error(ErrMsg.OPTION_OUT_OF_RANGE(VAR));
-            } else {
-                return new Date(y, m - 1, d);
-            }
-        }
-    } else {
-        return new Error(ErrMsg.OPTION_INVALID_FORMAT(VAR));
-    }
-};
-
-const checkDateInRange = (email, options) => {
-    const { dateFrom, dateTo } = options;
-    const { date } = email;
-
-    if (isUndefined(dateFrom) && isUndefined(dateTo)) {
-        return true;
-    } else if (isUndefined(dateTo)) {
-        const rs = parseDate(dateFrom, true);
-
-        if (rs instanceof Error) return rs;
-        if(rs > date) return false;
-        return true;
-    } else if (isUndefined(dateFrom)) {
-        const rs = parseDate(dateTo, false);
-
-        if (rs instanceof Error) return rs;
-        if(rs < date) return false;
-        return true;
-    }
-
-    const rsFrom = parseDate(dateFrom, true);
-    const rsTo = parseDate(dateTo, false);
-
-    if (rsFrom instanceof Error) return rsFrom;
-    if (rsTo instanceof Error) return rsTo;
-    if (rsFrom > date || rsTo < date) return false;
-    return true;
-};
-
-const action = (args, options, logger) => {
+const action = (args, opts, logger) => {
     const emailList = new EmailList();
     const spinner = ora(InfoMsg.Loading).start();
 
@@ -118,7 +53,7 @@ const action = (args, options, logger) => {
         const emailParser = new EmailParser(data);
         const email = emailParser.parseAndCreateEmail();
 
-        const rs = checkDateInRange(email, options);
+        const rs = checkDateRange(email, opts, options);
         if (rs instanceof Error) spinner.stop(), logger.error(chalk.red(rs.message)), process.exit(1);
         else if (rs) emailList.push(email);
     }, () => {

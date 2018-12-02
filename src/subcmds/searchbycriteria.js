@@ -1,7 +1,6 @@
 /**
  * SPEC_10
  */
-
 const cli = require('caporal');
 const chalk = require('chalk');
 const ora = require('ora');
