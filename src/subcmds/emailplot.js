@@ -1,5 +1,6 @@
 /**
  * @author Cherchour Liece
+ * Spec 6 
  */
 const cli = require('caporal');
 const chalk = require('chalk');

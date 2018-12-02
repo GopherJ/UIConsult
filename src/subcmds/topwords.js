@@ -1,7 +1,7 @@
 /**
  * @author Cherchour Liece
+ * Spec 5 
  */
-const cli = require('caporal');
 const chalk = require('chalk');
 const ora = require('ora');
 
@@ -12,14 +12,8 @@ const ErrMsg = require('../msg/ErrMsg');
 const InfoMsg = require('../msg/InfoMsg');
 
 const { 
-    isInRange, 
     isNull, 
-    isUndefined,
-    lastDayOfMonth, 
     isArrayAndHasLength,
-    isNumber,
-    getHour,
-    getTodaysDate,
     sortDescending,
     ArrayOfUniqueWords
 } = require('../utils');
@@ -128,10 +122,6 @@ const checkEmployeeName = (email, args) => {
 const action = (args, options, logger) => {
     // start the spinner
     const spinner = ora(InfoMsg.Loading).start();
-
-    // intialisation
-    let sent = 0;
-    let received = 0;
 
     // create table, detect terminal's width and use the width and table head
     // to init a correct table

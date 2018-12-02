@@ -1,7 +1,7 @@
 /**
  * @author Cherchour Liece
+ * Spec 4
  */
-const cli = require('caporal');
 const chalk = require('chalk');
 const ora = require('ora');
 
@@ -14,12 +14,8 @@ const InfoMsg = require('../msg/InfoMsg');
 
 
 const { 
-    isInRange, 
     isNull, 
-    isUndefined,
-    lastDayOfMonth, 
     isArrayAndHasLength,
-    isNumber,
     arrayOfReceiversName,
     senderName,
     sortDescendingTopContact
@@ -212,7 +208,9 @@ const action = (args, options, logger) => {
                 }
                 if(pos === -1)
                 {
-                    let arrayPush = [name,0,1,0]
+                    let arrayPush = [name,0,1,1];
+                    topContact.push(arrayPush);
+
                 }
                 else
                 {
