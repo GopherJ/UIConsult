@@ -5,6 +5,7 @@
  * 
  */
 const dayjs = require('dayjs');
+const objectPath = require('object-path');
 const { timeUnitMap } = require('./constants');
 
 const isString = s => typeof s === 'string';
@@ -49,6 +50,7 @@ const diffOfSecs = (a, b) => !(isDate(a) && isDate(b))
 const convTimeUnitCombToNum = s => !(/^\s*[1-9](h|m|d|w|m|y)\s*$/.test(s))
     ? NaN
     : s.match(/^\s*([1-9])(h|m|d|w|m|y)\s*$/).slice(1).reduce((ite, cur) => (+ite) * timeUnitMap[cur]);
+const updateTimeUnit = (s, u) => isArrayAndHasLength(s.layer) && s.layer.forEach(l => objectPath.set(l, ['encoding', 'x', 'timeUnit'], u));
 
 module.exports = {
     isString,
@@ -77,5 +79,6 @@ module.exports = {
     descendingByIdx,
     uniqueWords,
     diffOfSecs,
-    convTimeUnitCombToNum
+    convTimeUnitCombToNum,
+    updateTimeUnit
 };

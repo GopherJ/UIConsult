@@ -8,8 +8,6 @@
 const cli = require('caporal');
 const chalk = require('chalk');
 const ora = require('ora');
-const vg = require('vega');
-const vegalite = require('vega-lite');
 const FileWalker = require('../lib/FileWalker');
 const EmailParser = require('../lib/EmailParser');
 const ErrMsg = require('../msg/ErrMsg');
@@ -19,8 +17,12 @@ const checkEmployeeName = require('../utils/checkEmployeeName');
 const schema = require('../schema/exchanged');
 const createServerWithSchema = require('../lib/HttpServer');
 const {
+    isUndefined,
+    updateTimeUnit
+} = require('../utils');
+const {
     exchanged,
-    vegaTimeUnits
+    vegaTimeUnits,
 } = require('../utils/constants');
 
 const alias = 'emp';
@@ -81,7 +83,7 @@ const action = (args, opts, logger) => {
         
         const rsDate = checkDateRange(email, opts, options);
         // check employee's name, if there is an error then bubble up
-        const rsEmployee = checkEmployeeName(email, args);        
+        const rsEmployee = checkEmployeeName(email, args);    
         // error
         if (rsDate instanceof Error) 
             // stop spinner, log error, exit process
@@ -90,7 +92,12 @@ const action = (args, opts, logger) => {
             // stop spinner, log error, exit process
             spinner.stop(), logger.error(chalk.red(rsEmployee.message)), process.exit(1);
         // no error
+        else if (!isUndefined(opts.frequency) && !vegaTimeUnits.includes(opts.frequency)) {
+            spinner.stop(), logger.error(chalk.red(ErrMsg.OPTION_INVALID_FORMAT(options.frequency.var))), process.exit(1);
+        }
         else {
+            updateTimeUnit(schema, opts.frequency);
+
             switch(rsEmployee) {
             case exchanged.SENT:
                 exchangedEmails.push({
@@ -109,10 +116,9 @@ const action = (args, opts, logger) => {
     }, () => {
         // file walker ends correctly
         // stop spinner
-        spinner.stop();
+        spinner.stop()
         //Svg
         schema['data']['values'] = exchangedEmails;
-        console.log(JSON.stringify(schema))
         createServerWithSchema(schema);
     }, path => {
         // file walker ends with an error of permission
