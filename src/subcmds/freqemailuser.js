@@ -10,7 +10,7 @@ const path = require('path');
 var vg = require('vega');
 var vegalite = require('vega-lite');
 
-const OpenSVG = require('../lib/OpenSVG');
+const Open = require('../lib/Open');
 const FileWalker = require('../lib/FileWalker');
 const EmailParser = require('../lib/EmailParser');
 
@@ -285,7 +285,7 @@ const action = (args, options, logger) => {
            fs.existsSync(dir) || fs.mkdirSync(dir);
            fs.writeFileSync(options.file, res);
            view.finalize();
-           OpenSVG(options.file);
+           Open(options.file);
 
        });
 

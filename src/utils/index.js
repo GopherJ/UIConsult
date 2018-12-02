@@ -1,10 +1,11 @@
 /**
  *  util functions
  * 
- *  @author Cheng
+ *  @author Cheng JIANG
  * 
  */
 const dayjs = require('dayjs');
+const { timeUnitMap } = require('./constants');
 
 const isString = s => typeof s === 'string';
 const isEmptyString = s => isString(s) && s === '';
@@ -30,8 +31,10 @@ const formatDateHour = d => dayjs(d).format('YYYY-MM-DD HH:mm:ss');
 const formatDate = d => dayjs(d).format('YYYY-MM-DD');
 const formatHour = d => dayjs(d).format('HH:mm:ss');
 const makeArray = (s, i) => new Array(s).fill(i);
+const ascending = (b, a) => b < a ? -1 : b > a ? 1 : b >= a ? 0 : NaN;
 const descending = (a, b) => b < a ? -1 : b > a ? 1 : b >= a ? 0 : NaN;
 const descendingByProp = p => ((a, b) => b[p] < a[p] ? -1 : b[p] > a[p] ? 1 : b[p] >= a[p] ? 0 : NaN);
+const ascendingByProp = p => ((b, a) => b[p] < a[p] ? -1 : b[p] > a[p] ? 1 : b[p] >= a[p] ? 0 : NaN);
 const descendingByIdx = p => ((a, b) => b[p] < a[p] ? -1 : b[p] > a[p] ? 1 : b[p] >= a[p] ? 0 : NaN);
 const isOutsideWorkingHours = d => !(isDate(d) && d.getHours() > 8 && d.getHours() < 22);
 const isTheSameStrIgnoreCase = (a, b) => isString(a) && isString(b) && a.toUpperCase() === b.toUpperCase();
@@ -40,6 +43,12 @@ const uniqueWords = s => isEmptyString(s)
     : /[a-zA-Z]{2,}/.test(s)
     ? Array.from(new Set(s.match(/[a-zA-Z]{2,}/g))).filter(w => !['re', 'fw', 'fwd'].some(x => isTheSameStrIgnoreCase(w, x)))
     : [];
+const diffOfSecs = (a, b) => !(isDate(a) && isDate(b))
+    ? 0
+    : Math.ceil(Math.abs(a.valueOf() - b.valueOf()) / 1000);
+const convTimeUnitCombToNum = s => !(/^\s*[1-9](h|m|d|w|m|y)\s*$/.test(s))
+    ? NaN
+    : s.match(/^\s*([1-9])(h|m|d|w|m|y)\s*$/).slice(1).reduce((ite, cur) => (+ite) * timeUnitMap[cur]);
 
 module.exports = {
     isString,
@@ -61,8 +70,12 @@ module.exports = {
     formatDate,
     formatHour,
     makeArray,
+    ascending,
+    ascendingByProp,
     descending,
     descendingByProp,
     descendingByIdx,
-    uniqueWords
+    uniqueWords,
+    diffOfSecs,
+    convTimeUnitCombToNum
 };

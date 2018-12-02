@@ -1,5 +1,5 @@
 /**
- * script for opening svg files
+ * script for opening files, webpages
  * 
  * @param {String} path
  * @return {void}
@@ -9,7 +9,7 @@ const os = require('os');
 
 const { spawn } = require('child_process');
 
-const OpenSVG = path => {
+const Open = path => {
     switch (os.platform()) {
     case 'darwin':
         spawn('start', [path]);
@@ -23,4 +23,4 @@ const OpenSVG = path => {
     }
 };
 
-module.exports = OpenSVG; 
+module.exports = Open; 

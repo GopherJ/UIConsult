@@ -19,3 +19,30 @@ exports.monthsMap = {
     'Dec': 12
 };
 
+exports.timeUnitMap = {
+    h: 60 * 60,
+    d: 24 * 60 * 60,
+    w: 7 * 24 * 60 * 60,
+    m: 30 * 24 * 60 * 60,
+    y: 365 * 24 * 60 * 60
+};
+
+exports.vegaTimeUnits = [
+    "yearmonthdatehours", 
+    "yearmonthdatehoursminutes",
+    "yearmonthdatehoursminutesseconds",
+    "quarter", 
+    "quartermonth",
+    "month", 
+    "monthdate",
+    "date",
+    "day",
+    "hours",
+    "hoursminutes",
+    "hoursminutesseconds",
+    "minutes",
+    "minutesseconds",
+    "seconds",
+    "secondsmilliseconds",
+    "milliseconds" 
+];
