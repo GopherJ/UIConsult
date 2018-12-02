@@ -16,25 +16,24 @@ const OpenSVG = require('../lib/OpenSVG');
 
 const FileWalker = require('../lib/FileWalker');
 const EmailParser = require('../lib/EmailParser');
-const EmailList = require('../lib/EmailList');
 
 const ErrMsg = require('../msg/ErrMsg');
 const InfoMsg = require('../msg/InfoMsg');
 
-var X = [];
-const Z = [];
+var tb = [];
+const Tab = [];
 
 var chartDay = {
     "data": {"values":[]},
     "mark": "line",
     "encoding": {
       "x": {
-        "timeUnit": "yearmonthday",
+        "timeUnit": "yearmonthdate",
         "field": "date",
         "type": "nominal"
       },
       "y": {
-        "aggregate": "max",
+        "aggregate": "",
         "field": "email",
         "type": "quantitative"
       }
@@ -52,7 +51,7 @@ var chartDay = {
         "type": "nominal"
       },
       "y": {
-        "aggregate": "max",
+        "aggregate": "",
         "field": "email",
         "type": "quantitative"
       }
@@ -71,7 +70,7 @@ const alias = 'nbmc';
 
 const command = {
     name: 'nbemailsColab',
-    description: 'Load emails of specific period'
+    description: 'Display the number of emails sent from all the collaborators on a daily or a monthly basis'
 };
 
 const arguments = [
@@ -94,17 +93,17 @@ const options = {
     },
     d: {
         var: '-d, --day',
-        description: 'day or month',
+        description: 'Search for the nomber of emails per day',
         type: cli.BOOL
     },
     m: {
         var: '-m, --month',
-        description: 'day or month',
+        description: 'Search for the number of emails per month',
         type: cli.BOOL
     },
     file: {
         var: '-f, --file',
-        description: ' where the chart will be stored',
+        description: 'The path where the chart will be stored(saved)',
         type: cli.STRING
     }
 };
@@ -223,14 +222,14 @@ const action = (args, options, logger) => {
 
         const rs = checkDateInRange(email, options);
         if (rs instanceof Error) spinner.stop(), logger.error(chalk.red(rs.message)), process.exit(1);
-        else if (rs) Z.push(email);
+        else if (rs) Tab.push(email);
     }, () => {
 
         var tmp = [];
         var donnees = [];
         if(options.month){
-            for (var element in Z){
-                var emaildate = Z[element].date;
+            for (var element in Tab){
+                var emaildate = Tab[element].date;
                 tmp.push(emaildate);
             }
             tmp.sort(function(a, b) {
@@ -239,14 +238,14 @@ const action = (args, options, logger) => {
             for(var element in tmp){
                 const splt2 = (String(tmp[element]).split(' '));
                 const email2 = splt2[3]+'-'+monthsMap[splt2[1]];
-                X.push(email2);
+                tb.push(email2);
             }
 
-            donnees = resultData(X);
+            donnees = resultData(tb);
 
         }else if (options.day){
-            for (var element in Z){
-                var emaildate = Z[element].date;
+            for (var element in Tab){
+                var emaildate = Tab[element].date;
                 tmp.push(emaildate);
             }
                 tmp.sort(function(a, b) {
@@ -256,10 +255,10 @@ const action = (args, options, logger) => {
             for(var element in tmp){
                 const splt2 = (String(tmp[element]).split(' '));
                 const email2 = splt2[3]+'-'+monthsMap[splt2[1]]+'-'+splt2[2];
-                X.push(email2);
+                tb.push(email2);
                   }
                   
-              donnees = resultData(X);
+              donnees = resultData(tb);
 
  
         }
@@ -295,13 +294,6 @@ const action = (args, options, logger) => {
         var mySvg = view.toSVG();
         mySvg.then(function(res){
             const dir = path.dirname(options.file);
-            //  let filename = path.basename(options.path);
-    
-            //    const re = /\.svg$/;
-            //    if (!re.test(options.path)) {
-                    
-            //    }
-    
                fs.existsSync(dir) || fs.mkdirSync(dir);
                fs.writeFileSync(options.file, res);
                view.finalize();

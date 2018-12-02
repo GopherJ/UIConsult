@@ -14,14 +14,12 @@ var vegalite = require('vega-lite');
 const OpenSVG = require('../lib/OpenSVG');
 const FileWalker = require('../lib/FileWalker');
 const EmailParser = require('../lib/EmailParser');
-const EmailList = require('../lib/EmailList');
-
 
 const ErrMsg = require('../msg/ErrMsg');
 const InfoMsg = require('../msg/InfoMsg');
 
-var X = [];
-const Z = [];
+var tb = [];
+const Tab = [];
 
 const chart =   {  
         "data":{  
@@ -62,7 +60,7 @@ const alias = 'fmu';
 
 const command = {
     name: 'freqemailuser',
-    description: 'Load emails of specific period'
+    description: 'Access the frequency of a user’s sent emails on a period of time'
 };
 
 const arguments = [
@@ -85,29 +83,25 @@ const options = {
     },
     n:{
         var: '-n, --name',
-        description: 'user name',
+        description: 'search by user name',
         type: cli.BOOL
     },
     e:{
-        var: '-e, --email',
-        description: 'user adresse',
+        var: '-email, --email',
+        description: 'search by email address',
         type: cli.BOOL
     },
     param: {
-        var: '-e, --param',
-        description: 'user name or adresse',
+        var: '-p, --param',
+        description: 'user name or addresse',
         type: cli.STRING
     },
     file: {
         var: '-f, --file',
-        description: 'path where the chart will be stored',
+        description: 'The path where the chart will be stored(saved)',
         type: cli.STRING
     }
 };
-
-
-
-
 
 const parseDate = (dateStr, isDateFrom) => {
     const re = /^\s*(?:([0-9]{1,2})\/)?(?:([0-9]{1,2})\/)?(?:([0-9]{4}))\s*$/;
@@ -211,7 +205,6 @@ return abc;
 }
 
 const action = (args, options, logger) => {
-    const emailList = new EmailList();
     const spinner = ora(InfoMsg.Loading).start();
 
     FileWalker(args.dir, (err, absPath, data) => {
@@ -222,7 +215,7 @@ const action = (args, options, logger) => {
         
         const rs = checkDateInRange(email, options);
         if (rs instanceof Error) spinner.stop(), logger.error(chalk.red(rs.message)), process.exit(1);
-        else if (rs) Z.push(email);
+        else if (rs) Tab.push(email);
     
     }, () => {
         
@@ -232,10 +225,10 @@ const action = (args, options, logger) => {
         var donnees = [];
         if(options.email){
 
-            for (var element in Z){
+            for (var element in Tab){
                
-                emaildate = Z[element].date;
-                sender = Z[element].sender;
+                emaildate = Tab[element].date;
+                sender = Tab[element].sender;
                 if(sender === options.param)
                 tmp.push(emaildate);
                
@@ -246,9 +239,9 @@ const action = (args, options, logger) => {
                 const date_1 = splt2[3]+'-'+monthsMap[splt2[1]]+'-'+splt2[2];
                 const date_2 = splt2[4];
                 const emailDateFinal = date_1+' '+date_2
-                X.push(emailDateFinal);
+                tb.push(emailDateFinal);
                   }
-                donnees = resultData(X);
+                donnees = resultData(tb);
 
 
         }else if (options.name){
@@ -256,9 +249,9 @@ const action = (args, options, logger) => {
             exp1 = exp[0];
             exp2 = exp[1];
 
-            for (var element in Z){
-                sender = Z[element].sender;
-                emaildate = Z[element].date;
+            for (var element in Tab){
+                sender = Tab[element].sender;
+                emaildate = Tab[element].date;
                 if(sender.match(new RegExp(exp1, "i")) && sender.match(new RegExp(exp2, "i"))){
                     tmp.push(emaildate);
                 }
@@ -272,9 +265,9 @@ const action = (args, options, logger) => {
                 const date_1 = splt2[3]+'-'+monthsMap[splt2[1]]+'-'+splt2[2];
                 const date_2 = splt2[4];
                 const emailDateFinal = date_1+' '+date_2
-                X.push(emailDateFinal);
+                tb.push(emailDateFinal);
                   }
-                donnees = resultData(X);
+                donnees = resultData(tb);
         }
         spinner.stop();
 
@@ -287,18 +280,14 @@ const action = (args, options, logger) => {
        var view = new vg.View(runtime).renderer('svg').run();
        var mySvg = view.toSVG();
        mySvg.then(function(res){
-           const dir = path.dirname(options.file);
-        //  let filename = path.basename(options.path);
 
-        //    const re = /\.svg$/;
-        //    if (!re.test(options.path)) {
-                
-        //    }
+           const dir = path.dirname(options.file);
 
            fs.existsSync(dir) || fs.mkdirSync(dir);
            fs.writeFileSync(options.file, res);
            view.finalize();
            OpenSVG(options.file);
+
        });
 
     }, path => {
