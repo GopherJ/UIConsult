@@ -1,12 +1,11 @@
 /**
  *  util functions
  * 
+ *  @author Cheng
+ * 
  */
 const dayjs = require('dayjs');
 
-/**
- * @author Cheng
- */
 const isString = s => typeof s === 'string';
 const isEmptyString = s => isString(s) && s === '';
 const isNull = n => n === null;
@@ -35,77 +34,12 @@ const descending = (a, b) => b < a ? -1 : b > a ? 1 : b >= a ? 0 : NaN;
 const descendingByProp = p => ((a, b) => b[p] < a[p] ? -1 : b[p] > a[p] ? 1 : b[p] >= a[p] ? 0 : NaN);
 const descendingByIdx = p => ((a, b) => b[p] < a[p] ? -1 : b[p] > a[p] ? 1 : b[p] >= a[p] ? 0 : NaN);
 const isOutsideWorkingHours = d => !(isDate(d) && d.getHours() > 8 && d.getHours() < 22);
-
-/**
- * @author Liece 
- */
-const getTodaysDate = e =>
-{
-    let date = String(e.date);
-    let re = /[\w]{3}\s[\w]{3}\s[0-9]{2}\s[0-9]{4}/;
-    return date.match(re)[0];
-    
-}
-const sortDescending = (a,b) => {
-
-        if (a[1] === b[1]) {
-            return 0;
-        }
-        else {
-            return (a[1] > b[1]) ? -1 : 1;
-        }
-}
-
-const arrayOfReceiversName = e => { 
-    let test = /^.*(?=(\@))/;
-    let str = e.receivers.toString();
-    let display = str.split(',');
-    for(let i = 0; i < display.length ;i++)
-    {
-        if(!isNull(display[i].match(test)))
-        {
-            display[i] = display[i].match(test)[0];
-        }
-
-    }
-    return display;
-}
-
-const senderName = e => {
-    let test = /^.*(?=(\@))/;
-    return e.sender.match(test)[0];    
-}
-
-const sortDescendingTopContact =(a,b) =>
-{
-    if (a[3] === b[3]) {
-        return 0;
-    }
-    else {
-        return (a[3] > b[3]) ? -1 : 1;
-    }
-}
-const ArrayOfUniqueWords= s => {
-    var emailStarter = ["re","fw","fwd"];
-    let reg = /((\b[^\s]+\b))/g;
-    if(s.match(reg)!==null) {
-    let words = s.match(reg).slice(1);
-    let lowerCaseWords = words.map(v => v.toLowerCase());
-    let lowerCaseUniqueWords = lowerCaseWords.filter(function onlyUnique(value, index, self) { 
-        return self.indexOf(value) === index;
-    })
-    for (let index = 0; index < emailStarter.length; index++) {
-        var indexWords = lowerCaseUniqueWords.indexOf(emailStarter[index])
-        if(indexWords !== -1)
-        {
-            lowerCaseUniqueWords.splice(indexWords,1);
-        }
-        
-    }
-    return lowerCaseUniqueWords;
-}
-    return "";
-}
+const isTheSameStrIgnoreCase = (a, b) => isString(a) && isString(b) && a.toUpperCase() === b.toUpperCase();
+const uniqueWords = s => isEmptyString(s)
+    ? []
+    : isNull(/[a-zA-Z]{2,}/.test(s))
+    ? []
+    : Array.from(new Set(s.match(/[a-zA-Z]{2,}/g))).filter(w => !['re', 'fw', 'fwd'].some(x => isTheSameStrIgnoreCase(w, x)));
 
 module.exports = {
     isString,
@@ -130,11 +64,5 @@ module.exports = {
     descending,
     descendingByProp,
     descendingByIdx,
-
-    getTodaysDate,
-    sortDescending,
-    arrayOfReceiversName,
-    senderName,
-    sortDescendingTopContact,
-    ArrayOfUniqueWords,
+    uniqueWords
 };

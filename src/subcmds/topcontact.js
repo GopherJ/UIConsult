@@ -2,6 +2,8 @@
  * SPEC_4
  * 
  * @author Cherchour Liece
+ * 
+ * Edit: Cheng JIANG
  */
 const cli = require('caporal');
 const chalk = require('chalk');

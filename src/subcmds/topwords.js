@@ -2,38 +2,28 @@
  * SPEC_5
  * 
  * @author Cherchour Liece
+ * 
+ * Edit: Cheng JIANG
  */
 const cli = require('caporal');
 const chalk = require('chalk');
 const ora = require('ora');
-
 const FileWalker = require('../lib/FileWalker');
 const EmailParser = require('../lib/EmailParser');
 const Table = require('../lib/Table');
 const ErrMsg = require('../msg/ErrMsg');
 const InfoMsg = require('../msg/InfoMsg');
+const checkDateRange = require('../utils/checkDateRange');
+const checkEmployeeName = require('../utils/checkEmployeeName');
 
 const { 
-    isInRange, 
-    isNull, 
-    isUndefined,
-    lastDayOfMonth, 
-    isArrayAndHasLength,
-    isNumber,
-    getHour,
-    getTodaysDate,
-    sortDescending,
-    ArrayOfUniqueWords
+    uniqueWords,
+    descendingByIdx
 } = require('../utils');
 
-/**
- * state for describing that it's an email sent or received by an employee
- */
-const exchanged = {
-    SENT: Symbol(),
-    RECEIVED: Symbol(),
-    NONE: Symbol()
-};
+const {
+    exchanged
+} = require('../utils/constants');
 
 const alias = 'tpw';
 
@@ -54,94 +44,30 @@ const arguments = {
 };
 
 const options = {
-};
-
-let topWords = [];
-let nbEmails = 0;
-
-/**
- * 
- * check if employee's name is included in email address
- * 
- * ToDo: parse email address and we need to have exactly the firstname and lastname
- * specified in caporal argument
- * 
- * @param {String} firstName 
- * @param {String} lastName 
- * @param {String} emailAddr 
- * @return {Boolean}
- */
-const testName = (firstName, lastName, emailAddr) => {
-    const [
-        firstNameUpper,
-        lastNameUpper,
-        emailAddrUpper
-    ] = [firstName, lastName, emailAddr].map(x => x.toUpperCase());
-
-    return emailAddrUpper.includes(firstNameUpper)
-        && emailAddrUpper.includes(lastNameUpper);
-};
-
-/**
- * 
- * check if employee's name (parsed from caporal argument) is included
- * in an email's address.
- * 
- * the employee's name must be separated by one or more spaces
- * e.g. 'cheng jiang', 'cheng        jiang' are valid
- * 
- * however
- *  'cheng', 'jiang' are not valid, maybe later I can add support for this
- * 
- * if it's included in sender, then this function returns 'exchanged.SENT'
- * if it's included in some receiver's email address, then this function returns 'exchanged.RECEIVED'
- * otherwise, this function returns 'exchanged.NONE'
- * 
- * @param {Email} email 
- * @param {Caporal.arguments} args 
- * @return {exchanged | Error}
- */
-const checkEmployeeName = (email, args) => {
-    const { employee } = args;
-    const { sender, receivers } = email;
-
-    const re = /^(\w+)(?: +)(\w+)$/;
-    const matches = employee.match(re);
-
-    // e.g 'cheng jiang'
-    if (!isNull(matches)) {
-        const [
-            firstName,
-            lastName
-        ] = matches.slice(1);
-
-        if (testName(firstName, lastName, sender)) 
-            return exchanged.SENT;
-        else if (isArrayAndHasLength(receivers) && receivers.some(r => testName(firstName, lastName, r))) 
-            return exchanged.RECEIVED;
-        else 
-            return exchanged.NONE;
-    } else {
-        // e.g. 'slkdjlsd'
-        return new Error(ErrMsg.OPTION_INVALID_FORMAT(arguments.employee.var));
+    dateFrom: {
+        var: '-s, --date-from',
+        description: 'Start date',
+        type: cli.STRING
+    },
+    dateTo: {
+        var: '-e, --date-to',
+        description: 'End date',
+        type: cli.STRING
     }
 };
 
-const action = (args, options, logger) => {
+const action = (args, opts, logger) => {
     // start the spinner
     const spinner = ora(InfoMsg.Loading).start();
 
-    // intialisation
-    let sent = 0;
-    let received = 0;
+    const words = new Map();
 
     // create table, detect terminal's width and use the width and table head
     // to init a correct table
     const tb = new Table([
         'Rank',
         'Word',
-        'Number of occurence',
-        'Percentage of appearance'
+        'Number of occurence'
     ]);
 
     // start to read file recursively
@@ -154,35 +80,30 @@ const action = (args, options, logger) => {
         // parse email and return an Email instance
         const email = emailParser.parseAndCreateEmail();
         
+        const rsDate = checkDateRange(email, opts, options);
         // check employee's name, if there is an error then bubble up
         const rsEmployee = checkEmployeeName(email, args);        
         
         // error
-        if (rsEmployee instanceof Error) 
+        if (rsDate instanceof Error)
+            // stop spinner, log error, exit process
+            spinner.stop(), logger.error(chalk.red(rsDate.message)), process.exit(1);
+        // error
+        else if (rsEmployee instanceof Error) 
             // stop spinner, log error, exit process
             spinner.stop(), logger.error(chalk.red(rsEmployee.message)), process.exit(1);
         // no error
-            if(rsEmployee === exchanged.SENT /* ||rsEmployee === exchanged.RECEIVED */ ) 
-            {
-                nbEmails++;
-                let wordsEmail = ArrayOfUniqueWords(email.subject);
-                wordsEmail.forEach(element => {
-                    let exist = false;
-                    for (let i = 0; i < topWords.length; i++) {
-                        if(topWords[i][0] === element) 
-                        {
-                            topWords[i][1]++;
-                            exist = true;
-                        }
-                        
+        else {
+            if(rsEmployee === exchanged.SENT) {
+                uniqueWords(email.subject).forEach(w => {
+                    if (words.has(w)) {
+                        words.set(w, words.get(w) + 1);
+                    } else {
+                        words.set(w, 1);
                     }
-                    if(!exist && (element!==""&&element!=="re"&&element!=="fw"&&element!=="fwd"))
-                    {
-                        let toPushElement = [element,1];
-                        topWords.push(toPushElement);
-                    }
-                });       
+                });
             }
+        }
     }, () => {
         // file walker ends correctly
         // stop spinner
@@ -190,18 +111,14 @@ const action = (args, options, logger) => {
 
         // add a table row, every item must be string otherwise if fails to add
         // more info => Table.js
-        topWords.sort(sortDescending);
-        let i = 0;
-        while(i < topWords.length && i < 10)
-        {
+        const wordsArray = [...words].sort(descendingByIdx(1)).slice(0, 10);
+        wordsArray.forEach((v, k) => {
             tb.push([
-                (i+1).toString(),
-                topWords[i][0].toString(),
-                topWords[i][1].toString(),
-                (Math.floor(topWords[i][1]/nbEmails*100)).toString()+"%"
-                        ]);
-            i++;
-        }
+                (k+1).toString(),
+                v[0],
+                v[1].toString()
+            ]);
+        });
 
         // print table
         process.stdout.write(tb.toString());
