@@ -51,16 +51,16 @@ const sortDescending = (a,b) => {
 const arrayOfReceiversName = e => { 
     let test = /^.*(?=(\@))/;
     let str = e.receivers.toString();
-    let affichage = str.split(',');
-    for(let i = 0; i < affichage.length ;i++)
+    let display = str.split(',');
+    for(let i = 0; i < display.length ;i++)
     {
-        if(!isNull(affichage[i].match(test)))
+        if(!isNull(display[i].match(test)))
         {
-            affichage[i] = affichage[i].match(test)[0];
+            display[i] = display[i].match(test)[0];
         }
 
     }
-    return affichage;
+    return display;
 }
 const senderName = e => {
     let test = /^.*(?=(\@))/;
@@ -74,6 +74,27 @@ const sortDescendingTopContact =(a,b) =>
     else {
         return (a[3] > b[3]) ? -1 : 1;
     }
+}
+const ArrayOfUniqueWords= s => {
+    var emailStarter = ["re","fw","fwd"];
+    let reg = /((\b[^\s]+\b))/g;
+    if(s.match(reg)!==null) {
+    let words = s.match(reg).slice(1);
+    let lowerCaseWords = words.map(v => v.toLowerCase());
+    let lowerCaseUniqueWords = lowerCaseWords.filter(function onlyUnique(value, index, self) { 
+        return self.indexOf(value) === index;
+    })
+    for (let index = 0; index < emailStarter.length; index++) {
+        var indexWords = lowerCaseUniqueWords.indexOf(emailStarter[index])
+        if(indexWords !== -1)
+        {
+            lowerCaseUniqueWords.splice(indexWords,1);
+        }
+        
+    }
+    return lowerCaseUniqueWords;
+}
+    return "";
 }
 module.exports = {
     isString,
@@ -97,5 +118,6 @@ module.exports = {
     sortDescending,
     arrayOfReceiversName,
     senderName,
-    sortDescendingTopContact
+    sortDescendingTopContact,
+    ArrayOfUniqueWords
 };

@@ -4,7 +4,11 @@
 const cli = require('caporal');
 const chalk = require('chalk');
 const ora = require('ora');
+const vg = require('vega');
+const vegalite = require('vega-lite');
+const fs = require('fs');
 
+const OpenSVG = require('../lib/OpenSVG');
 const FileWalker = require('../lib/FileWalker');
 const EmailParser = require('../lib/EmailParser');
 const Table = require('../lib/Table');
@@ -32,11 +36,11 @@ const exchanged = {
     NONE: Symbol()
 };
 
-const alias = 'bzd';
+const alias = 'emp';
 
 const command = {
-    name: 'buzzydays',
-    description: "Show an employee's exchanged emails' statistics of specific period"
+    name: 'emailplot',
+    description: "Have a visual representation of the employee interactions."
 };
 
 const arguments = {
@@ -62,9 +66,51 @@ const options = {
         type: cli.STRING
     }
 };
-
-let buzzyDaysArrays = [];
-
+var emailPlot = {
+    "width": 560,
+    "data": {"values":[]},
+    "layer": [
+        {
+          "mark": "point",
+          "encoding": {
+            "x": {
+              "title": "",
+              "timeUnit": "yearmonthdate",
+              "field": "date",
+              "type": "temporal"
+            },
+            "y": {
+              "title": "",
+              "field": "receivedEmail",
+              "type": "quantitative"
+            },
+            "size": {
+              "value": 50
+            },
+            "color": {
+              "value": "green"
+            }
+          }
+        },
+        {
+          "mark": "point",
+          "encoding": {
+            "y": {
+              "title": "",
+              "field": "sentEmail",
+              "type": "quantitative"
+            },
+            "size": {
+              "value": 50
+            },
+            "color": {
+              "value": "blue"
+            }
+          }
+        }
+      ]
+  };
+let mailFrequency = [];
 /**
  * 
  * parse date string
@@ -179,22 +225,6 @@ const checkDateInRange = (email, options) => {
     return true;
 };
 
-const outsideWorkingHours = email => {
-    const WorkingHours1 = "08:01";
-    const WorkingHours2 = "21:59";
-
-    let hoursEmail = getHour(email);
-    if(hoursEmail > WorkingHours1 && hoursEmail < WorkingHours2)
-    {
-        return false
-    }
-    else
-    {
-        return true;
-    }
-
-}
-
 /**
  * 
  * check if employee's name is included in email address
@@ -212,10 +242,10 @@ const testName = (firstName, lastName, emailAddr) => {
         firstNameUpper,
         lastNameUpper,
         emailAddrUpper
-    ] = [firstName, lastName, emailAddr.replace(/@.*$/, '')]
-    .map(x => x.toUpperCase());
+    ] = [firstName, lastName, emailAddr].map(x => x.toUpperCase());
 
-    return `${firstNameUpper}.${lastNameUpper}` === emailAddrUpper;
+    return emailAddrUpper.includes(firstNameUpper)
+        && emailAddrUpper.includes(lastNameUpper);
 };
 
 /**
@@ -241,15 +271,15 @@ const checkEmployeeName = (email, args) => {
     const { employee } = args;
     const { sender, receivers } = email;
 
-    const re = /^\s*(?:(?:(\w+)(?:\s+)(\w+))|(?:(\w+)\.(\w+)@.+))\s*$/;
+    const re = /^(\w+)(?: +)(\w+)$/;
     const matches = employee.match(re);
 
-    // e.g 'cheng jiang' 'cheng.jiang@utt.fr' '  cheng  jiang  ' ' cheng.jiang@utt.fr '
+    // e.g 'cheng jiang'
     if (!isNull(matches)) {
         const [
             firstName,
             lastName
-        ] = matches.slice(1).filter(x => !isUndefined(x));
+        ] = matches.slice(1);
 
         if (testName(firstName, lastName, sender)) 
             return exchanged.SENT;
@@ -266,10 +296,6 @@ const checkEmployeeName = (email, args) => {
 const action = (args, options, logger) => {
     // start the spinner
     const spinner = ora(InfoMsg.Loading).start();
-
-    // intialisation
-    let sent = 0;
-    let received = 0;
 
     // create table, detect terminal's width and use the width and table head
     // to init a correct table
@@ -289,11 +315,10 @@ const action = (args, options, logger) => {
         // parse email and return an Email instance
         const email = emailParser.parseAndCreateEmail();
         
-        // check date, if there is an error then bubble up
-        const rsDate = (checkDateInRange(email, options) && outsideWorkingHours(email));               
         // check employee's name, if there is an error then bubble up
         const rsEmployee = checkEmployeeName(email, args);        
         
+        const rsDate = (checkDateInRange(email, options));
         // error
         if (rsDate instanceof Error) 
             // stop spinner, log error, exit process
@@ -302,14 +327,14 @@ const action = (args, options, logger) => {
             // stop spinner, log error, exit process
             spinner.stop(), logger.error(chalk.red(rsEmployee.message)), process.exit(1);
         // no error
-        else if (rsDate) {
-            if(rsEmployee === exchanged.SENT)
-            {
+        else if(rsDate)
+        {
+            if(rsEmployee === exchanged.SENT){
                 let daysAlreadyImputed = false;
                 let indexImputed;
-                for(let i = 0; i < buzzyDaysArrays.length;i++)
+                for(let i = 0; i < mailFrequency.length;i++)
                 {
-                    if(buzzyDaysArrays[i][0] === getTodaysDate(email))
+                    if(Date.parse(mailFrequency[i].date) === Date.parse(getTodaysDate(email)))
                     {
                         daysAlreadyImputed = true;
                         indexImputed = i;
@@ -318,37 +343,65 @@ const action = (args, options, logger) => {
                 }
                 if(daysAlreadyImputed)
                 {
-                    buzzyDaysArrays[indexImputed][1]++;
+                    mailFrequency[indexImputed].sentEmail++;
                 }
                 else
                 {
-                    buzzyDaysArrays.push([getTodaysDate(email),1]);
+                    let toInput = {
+                        "date": (getTodaysDate(email)),
+                        "sentEmail" : 1,
+                        "receivedEmail" : 0
+                    };
+                    mailFrequency.push(toInput);  
                 }
-                
-
+        }
+        else if(rsEmployee === exchanged.RECEIVED){
+            let daysAlreadyImputed = false;
+            let indexImputed;
+            for(let i = 0; i < mailFrequency.length;i++)
+            {
+                if(Date.parse(mailFrequency[i].date) === Date.parse(getTodaysDate(email)))
+                {
+                    daysAlreadyImputed = true;
+                    indexImputed = i;
+                    break;
+                }
+            }
+            if(daysAlreadyImputed)
+            {
+                mailFrequency[indexImputed].receivedEmail++;
+            }
+            else
+            {
+                let toInput = {
+                    "date": (getTodaysDate(email)),
+                    "sentEmail" : 0,
+                    "receivedEmail" : 1
+                };
+                mailFrequency.push(toInput);  
             }
         }
+}
     }, () => {
         // file walker ends correctly
         // stop spinner
         spinner.stop();
+        //console.log(mailFrequency)
+        //Svg
+        emailPlot['data']['values'] = mailFrequency;
+        Json = JSON.stringify(emailPlot);      
+        
+        const myChart = vegalite.compile(emailPlot, {config: {background: "white"}}).spec;
 
-        // add a table row, every item must be string otherwise if fails to add
-        // more info => Table.js
-        buzzyDaysArrays.sort(sortDescending);
-        let i = 0;
-        while(i < buzzyDaysArrays.length && i < 10)
-        {
-            tb.push([
-                (i+1).toString(),
-                buzzyDaysArrays[i][0].toString(),
-                buzzyDaysArrays[i][1].toString()
-                        ]);
-            i++;
-        }
-
-        // print table
-        process.stdout.write(tb.toString());
+        /* SVG version */        
+        var runtime = vg.parse(myChart);
+        var view = new vg.View(runtime).renderer('svg').run();
+        var mySvg = view.toSVG();
+        mySvg.then(function(res){
+            fs.writeFileSync("./result.svg", res)
+            view.finalize();
+            OpenSVG('./result.svg')
+        });
     }, path => {
         // file walker ends with an error of permission
         // it fails to read a directory
@@ -361,7 +414,7 @@ const action = (args, options, logger) => {
 module.exports = {
     alias,
     command,
-    arguments,
+    arguments,  
     options,
     action
 };
