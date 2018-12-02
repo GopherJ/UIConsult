@@ -212,10 +212,10 @@ const testName = (firstName, lastName, emailAddr) => {
         firstNameUpper,
         lastNameUpper,
         emailAddrUpper
-    ] = [firstName, lastName, emailAddr].map(x => x.toUpperCase());
+    ] = [firstName, lastName, emailAddr.replace(/@.*$/, '')]
+    .map(x => x.toUpperCase());
 
-    return emailAddrUpper.includes(firstNameUpper)
-        && emailAddrUpper.includes(lastNameUpper);
+    return `${firstNameUpper}.${lastNameUpper}` === emailAddrUpper;
 };
 
 /**
@@ -241,15 +241,15 @@ const checkEmployeeName = (email, args) => {
     const { employee } = args;
     const { sender, receivers } = email;
 
-    const re = /^(\w+)(?: +)(\w+)$/;
+    const re = /^\s*(?:(?:(\w+)(?:\s+)(\w+))|(?:(\w+)\.(\w+)@.+))\s*$/;
     const matches = employee.match(re);
 
-    // e.g 'cheng jiang'
+    // e.g 'cheng jiang' 'cheng.jiang@utt.fr' '  cheng  jiang  ' ' cheng.jiang@utt.fr '
     if (!isNull(matches)) {
         const [
             firstName,
             lastName
-        ] = matches.slice(1);
+        ] = matches.slice(1).filter(x => !isUndefined(x));
 
         if (testName(firstName, lastName, sender)) 
             return exchanged.SENT;

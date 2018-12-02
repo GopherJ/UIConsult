@@ -103,7 +103,7 @@ const checkDateInRange = (email, options) => {
     const rsTo = parseDate(dateTo, false);
 
     if (rsFrom instanceof Error) return rsFrom;
-    if (rsTo instanceof Error) return rsTo
+    if (rsTo instanceof Error) return rsTo;
     if (rsFrom > date || rsTo < date) return false;
     return true;
 };
