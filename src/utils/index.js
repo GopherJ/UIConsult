@@ -37,9 +37,9 @@ const isOutsideWorkingHours = d => !(isDate(d) && d.getHours() > 8 && d.getHours
 const isTheSameStrIgnoreCase = (a, b) => isString(a) && isString(b) && a.toUpperCase() === b.toUpperCase();
 const uniqueWords = s => isEmptyString(s)
     ? []
-    : isNull(/[a-zA-Z]{2,}/.test(s))
-    ? []
-    : Array.from(new Set(s.match(/[a-zA-Z]{2,}/g))).filter(w => !['re', 'fw', 'fwd'].some(x => isTheSameStrIgnoreCase(w, x)));
+    : /[a-zA-Z]{2,}/.test(s)
+    ? Array.from(new Set(s.match(/[a-zA-Z]{2,}/g))).filter(w => !['re', 'fw', 'fwd'].some(x => isTheSameStrIgnoreCase(w, x)))
+    : [];
 
 module.exports = {
     isString,
