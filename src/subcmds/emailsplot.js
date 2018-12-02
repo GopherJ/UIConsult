@@ -112,6 +112,7 @@ const action = (args, opts, logger) => {
         spinner.stop();
         //Svg
         schema['data']['values'] = exchangedEmails;
+        console.log(JSON.stringify(schema))
         createServerWithSchema(schema);
     }, path => {
         // file walker ends with an error of permission
