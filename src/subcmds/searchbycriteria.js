@@ -12,7 +12,7 @@ const EmailList = require('../lib/EmailList');
 const ErrMsg = require('../msg/ErrMsg');
 const InfoMsg = require('../msg/InfoMsg');
 
-const Z = [];
+const Tab = [];
 
 const { 
     isInRange, 
@@ -27,7 +27,7 @@ const alias = 'sbc';
 
 const command = {
     name: 'SearchByCriteria',
-    description: 'Load emails of specific period'
+    description: 'Email research per criteria'
 };
 
 const arguments = [
@@ -48,14 +48,24 @@ const options = {
         description: 'End date',
         type: cli.STRING
     },
-    noe: {
-        var: '-e, --wen',
-        description: 'user name or adresse',
-        type: cli.STRING
+    n:{
+        var: '-n, --name',
+        description: 'search for emails by user name',
+        type: cli.BOOL
+    },
+    e:{
+        var: '-email, --email',
+        description: 'search for emails by email address',
+        type: cli.BOOL
+    },
+    w:{
+        var: '-w, --word',
+        description: 'search for emails using a word',
+        type: cli.BOOL
     },
     param: {
         var: '-e, --param',
-        description: 'user name or adresse',
+        description: 'user name, email adresse or a word',
         type: cli.STRING
     }
 };
@@ -152,7 +162,7 @@ const action = (args, options, logger) => {
         
         const rs = checkDateInRange(email, options);
         if (rs instanceof Error) spinner.stop(), logger.error(chalk.red(rs.message)), process.exit(1);
-        else if (rs) Z.push(email);
+        else if (rs) Tab.push(email);
     
     }, () => {
         
@@ -162,16 +172,16 @@ const action = (args, options, logger) => {
         var content = '';
         
 
-        if(options.wen ==="e"){
+        if(options.email){
 
-            for (var element in Z){
+            for (var element in Tab){
                
-                sender = Z[element].sender;
-                recievers = Z[element].receivers;
+                sender = Tab[element].sender;
+                recievers = Tab[element].receivers;
 
                 if(sender === options.param || (recievers.indexOf(options.param)) != -1 ){
-                tmp.push(Z[element]);
-                emailList.push(Z[element]);    
+                tmp.push(Tab[element]);
+                emailList.push(Tab[element]);    
             }
              }
              
@@ -179,20 +189,20 @@ const action = (args, options, logger) => {
              process.stdout.write(emailList.toString());
 
 
-        }else if (options.wen ==="n"){
+        }else if (options.name){
             exp = options.param.split(' ')
             exp1 = exp[0];
             exp2 = exp[1];
 
-            for (var element in Z){
+            for (var element in Tab){
 
-               sender = Z[element].sender;
-               recievers = Z[element].receivers;
-               content = Z[element].content;
+               sender = Tab[element].sender;
+               recievers = Tab[element].receivers;
+               content = Tab[element].content;
 
                 if(sender.match(new RegExp(exp1, "i")) && sender.match(new RegExp(exp2, "i"))||matchRecievers(recievers, exp1, exp2) || content.match(new RegExp(exp1, "i")) && content.match(new RegExp(exp2, "i"))){
-                    tmp.push(Z[element]);
-                    emailList.push(Z[element]);    
+                    tmp.push(Tab[element]);
+                    emailList.push(Tab[element]);    
 
                  }
             }  
@@ -200,18 +210,18 @@ const action = (args, options, logger) => {
             spinner.stop();
             process.stdout.write(emailList.toString());
 
-        }else if (options.wen ==="w"){
+        }else if (options.word){
 
-            for (var element in Z){
+            for (var element in Tab){
 
-            sender = Z[element].sender;
-            recievers = Z[element].receivers;
-            content = Z[element].content;
+            sender = Tab[element].sender;
+            recievers = Tab[element].receivers;
+            content = Tab[element].content;
 
             if(sender.match(new RegExp(options.param, "i"))||matchRecievers(recievers, options.param, null) || content.match(new RegExp(options.param, "i"))){
                 
-                tmp.push(Z[element]);
-                emailList.push(Z[element]);
+                tmp.push(Tab[element]);
+                emailList.push(Tab[element]);
             }
         }
         
