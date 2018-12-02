@@ -34,7 +34,7 @@ const alias = 'top';
 
 const command = {
     name: 'topcontact',
-    description: "Show an employee's exchanged emails' statistics of specific period"
+    description: "Displays the employee name followed with a list of the ten employee’s name\n he/she exchanged the most with. Each employee’s name is followed with the\nnumber of sent, received and the total of emails exchanged."
 };
 
 const arguments = {
