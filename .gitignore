@@ -86,3 +86,6 @@ typings/
 
 # FuseBox cache
 .fusebox/
+
+# donneesSujetB
+donneesSujetB/
