@@ -14,16 +14,15 @@ const createServerWithSchema = schema => {
 
                 res.writeHead(502, 'Internal Server Error');
                 res.end();
-            }
-            else {
+            } else {
                 res.writeHead(200, 'Ok', {'Content-Type': 'text/html;charset=utf-8'});
-                res.end(data.replace(/<script>(.*)<\/script>/, '<script>const vlSpec='+JSON.stringify(schema)+';$1</script>'));
+                res.end(data.replace(/<script>(.*)<\/script>/, `<script>const vlSpec=${JSON.stringify(schema)};$1</script>`));
             }
         });
     }).listen(PORT, HOST, () => {
         process.stdout.write(`\n     Server is listening on ${HOST}:${PORT}...\n`);
         Open(`http://${HOST}:${PORT}`);
-    }); 
+    });
 };
 
 module.exports = createServerWithSchema;

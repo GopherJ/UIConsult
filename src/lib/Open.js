@@ -1,6 +1,6 @@
 /**
  * script for opening files, webpages
- * 
+ *
  * @param {String} path
  * @return {void}
  */
@@ -23,4 +23,4 @@ const Open = path => {
     }
 };
 
-module.exports = Open; 
+module.exports = Open;

@@ -116,7 +116,7 @@ const action = (args, opts, logger) => {
     }, () => {
         // file walker ends correctly
         // stop spinner
-        spinner.stop()
+        spinner.stop();
         //Svg
         schema['data']['values'] = exchangedEmails;
         createServerWithSchema(schema);
