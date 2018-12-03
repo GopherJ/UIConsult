@@ -64,6 +64,7 @@ const parseEmailAddr = addr => isEmptyString(addr)
     ? ''
     : addr.replace(/@.*$/, '').split(/[\.]+/).join(' ');
 const percent = (v, t) => `${(v / t).toFixed(4) * 100}%`;
+const noop = () => {};
 
 module.exports = {
     isString,
@@ -99,5 +100,6 @@ module.exports = {
     updateTimeUnit,
     parseEmployeeName,
     parseEmailAddr,
-    percent
+    percent,
+    noop
 };

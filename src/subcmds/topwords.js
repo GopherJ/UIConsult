@@ -17,15 +17,11 @@ const checkDateRange = require('../utils/checkDateRange');
 const checkEmployeeName = require('../utils/checkEmployeeName');
 
 const {
+    noop,
     words,
     percent,
     descendingByIdxProp,
 } = require('../utils');
-
-const uni = {
-    UNIQ: Symbol(),
-    NUNIQ: Symbol()
-};
 
 const {
     exchanged
@@ -67,7 +63,7 @@ const action = (args, opts, logger) => {
     const spinner = ora(InfoMsg.Loading).start();
 
     const wordsMap = new Map();
-    const { UNIQ, NUNIQ } = uni;
+    const OCCURENCE = Symbol(), APPEARANCE = Symbol();
     let wordCount = 0;
 
     // create table, detect terminal's width and use the width and table head
@@ -105,17 +101,15 @@ const action = (args, opts, logger) => {
         else {
             let lock = false;
             if(rsEmployee === exchanged.SENT) {
-                // Map {word => {nuniq, uniq}}
+                // Map {word => {occurence, appearance}}
                 words(email.subject).forEach(w => {
-                    if (wordsMap.has(w)) {
-                        wordsMap.get(w)[NUNIQ] += 1;
-                        if (!lock) wordsMap.get(w)[UNIQ] += 1;
-                    } else {
-                        wordsMap.set(w, {[UNIQ]: 1, [NUNIQ]: 1});
-                    }
+                    !wordsMap.has(w)
+                        ? wordsMap.set(w, {[OCCURENCE]: 1, [APPEARANCE]: 1})
+                        : (wordsMap.get(w)[APPEARANCE] += 1, !lock)
+                        ? (wordsMap.get(w)[OCCURENCE] += 1, lock = true)
+                        : noop();
 
                     wordCount += 1;
-                    lock = true;
                 });
             }
         }
@@ -126,14 +120,14 @@ const action = (args, opts, logger) => {
 
         // add a table row, every item must be string otherwise if fails to add
         // more info => Table.js
-        const wordsArray = [...wordsMap].sort(descendingByIdxProp(1, UNIQ)).slice(0, 10);
+        const wordsArray = [...wordsMap].sort(descendingByIdxProp(1, OCCURENCE)).slice(0, 10);
 
         wordsArray.forEach((v, k) => {
             tb.push([
                 (k+1).toString(),
                 v[0],
-                v[1][UNIQ].toString(),
-                percent(v[1][NUNIQ], wordCount)
+                v[1][OCCURENCE].toString(),
+                percent(v[1][APPEARANCE], wordCount)
             ]);
         });
 
