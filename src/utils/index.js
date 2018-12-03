@@ -65,6 +65,7 @@ const parseEmailAddr = addr => isEmptyString(addr)
     : addr.replace(/@.*$/, '').split(/[\.]+/).join(' ');
 const percent = (v, t) => `${(v / t).toFixed(4) * 100}%`;
 const noop = () => {};
+const UpperFirstChar = s => s[0].toUpperCase() + s.substring(1);
 
 module.exports = {
     isString,
@@ -101,5 +102,6 @@ module.exports = {
     parseEmployeeName,
     parseEmailAddr,
     percent,
-    noop
+    noop,
+    UpperFirstChar
 };

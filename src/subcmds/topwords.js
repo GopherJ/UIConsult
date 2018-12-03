@@ -20,6 +20,7 @@ const {
     noop,
     words,
     percent,
+    UpperFirstChar,
     descendingByIdxProp,
 } = require('../utils');
 
@@ -63,7 +64,7 @@ const action = (args, opts, logger) => {
     const spinner = ora(InfoMsg.Loading).start();
 
     const wordsMap = new Map();
-    const OCCURENCE = Symbol(), APPEARANCE = Symbol();
+    const Occurence = Symbol(), Appearance = Symbol();
     let wordCount = 0;
 
     // create table, detect terminal's width and use the width and table head
@@ -103,10 +104,12 @@ const action = (args, opts, logger) => {
             if(rsEmployee === exchanged.SENT) {
                 // Map {word => {occurence, appearance}}
                 words(email.subject).forEach(w => {
-                    !wordsMap.has(w)
-                        ? wordsMap.set(w, {[OCCURENCE]: 1, [APPEARANCE]: 1})
-                        : (wordsMap.get(w)[APPEARANCE] += 1, !lock)
-                        ? (wordsMap.get(w)[OCCURENCE] += 1, lock = true)
+                    const word = UpperFirstChar(w);
+
+                    !wordsMap.has(word)
+                        ? wordsMap.set(word, {[Occurence]: 1, [Appearance]: 1})
+                        : (wordsMap.get(word)[Appearance] += 1, !lock)
+                        ? (wordsMap.get(word)[Occurence] += 1, lock = true)
                         : noop();
 
                     wordCount += 1;
@@ -120,14 +123,14 @@ const action = (args, opts, logger) => {
 
         // add a table row, every item must be string otherwise if fails to add
         // more info => Table.js
-        const wordsArray = [...wordsMap].sort(descendingByIdxProp(1, OCCURENCE)).slice(0, 10);
+        const wordsArray = [...wordsMap].sort(descendingByIdxProp(1, Occurence)).slice(0, 10);
 
         wordsArray.forEach((v, k) => {
             tb.push([
                 (k+1).toString(),
                 v[0],
-                v[1][OCCURENCE].toString(),
-                percent(v[1][APPEARANCE], wordCount)
+                v[1][Occurence].toString(),
+                percent(v[1][Appearance], wordCount)
             ]);
         });
 
