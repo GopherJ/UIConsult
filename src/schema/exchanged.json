@@ -31,13 +31,13 @@
             "mark": "point",
             "encoding": {
                 "x": {
-                    "title": "Time",
+                    "title": "Date",
                     "field": "recv",
                     "timeUnit": "date",
                     "type": "temporal"
                 },
                 "y": {
-                    "title": "Count",
+                    "title": "Number Of Emails",
                     "type": "quantitative",
                     "aggregate": "count"
                 },

@@ -4,7 +4,7 @@
  * @Author: Cheng JIANG 
  * @Date: 2018-11-24 15:29:35 
  * @Last Modified by: Cheng JIANG
- * @Last Modified time: 2018-12-02 15:12:48
+ * @Last Modified time: 2018-12-03 18:34:27
  */
 const cli = require('caporal');
 const chalk = require('chalk');
@@ -83,7 +83,7 @@ const action = (args, opts, logger) => {
         // check date, if there is an error then bubble up
         const rsDate = checkDateRange(email, opts, options);
         // check employee's name, if there is an error then bubble up
-        const rsEmployee = checkEmployeeName(email, args);
+        const rsEmployee = checkEmployeeName(email, args, arguments);
 
         // error
         if (rsDate instanceof Error) 

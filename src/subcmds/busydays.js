@@ -97,11 +97,10 @@ const action = (args, opts, logger) => {
             if(rsEmployee == exchanged.SENT && isOutsideWorkingHours(email.date)) {
                 const date = formatDate(email.date);
 
-                if (busyDays.has(date)) {
+                if (busyDays.has(date))
                     busyDays.set(date, busyDays.get(date) + 1);
-                } else {
+                else
                     busyDays.set(date, 1);
-                }
             }
         }
     }, () => {

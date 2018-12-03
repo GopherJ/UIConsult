@@ -39,6 +39,11 @@ const ascendingByProp = p => ((b, a) => b[p] < a[p] ? -1 : b[p] > a[p] ? 1 : b[p
 const descendingByIdx = p => ((a, b) => b[p] < a[p] ? -1 : b[p] > a[p] ? 1 : b[p] >= a[p] ? 0 : NaN);
 const isOutsideWorkingHours = d => !(isDate(d) && d.getHours() > 8 && d.getHours() < 22);
 const isTheSameStrIgnoreCase = (a, b) => isString(a) && isString(b) && a.toUpperCase() === b.toUpperCase();
+const words = s => isEmptyString(s)
+    ? []
+    : /[a-zA-Z]{2,}/.test(s)
+    ? s.match(/[a-zA-Z]{2,}/g)
+    : [];
 const uniqueWords = s => isEmptyString(s)
     ? []
     : /[a-zA-Z]{2,}/.test(s)
@@ -77,6 +82,7 @@ module.exports = {
     descending,
     descendingByProp,
     descendingByIdx,
+    words,
     uniqueWords,
     diffOfSecs,
     convTimeUnitCombToNum,
