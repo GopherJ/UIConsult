@@ -1,10 +1,9 @@
-/*
- * SPEC_2
- *
- * @Author: Cheng JIANG 
- * @Date: 2018-11-24 15:29:35 
- * @Last Modified by: Cheng JIANG
- * @Last Modified time: 2018-12-03 18:34:27
+/**
+ * SPEC_5
+ * 
+ * @author Cherchour Liece
+ * 
+ * Edit: Cheng JIANG
  */
 const cli = require('caporal');
 const chalk = require('chalk');
@@ -12,20 +11,25 @@ const ora = require('ora');
 const FileWalker = require('../lib/FileWalker');
 const EmailParser = require('../lib/EmailParser');
 const Table = require('../lib/Table');
-const checkDateRange = require('../utils/checkDateRange');
-const checkEmployeeName = require('../utils/checkEmployeeName');
 const ErrMsg = require('../msg/ErrMsg');
 const InfoMsg = require('../msg/InfoMsg');
+const checkDateRange = require('../utils/checkDateRange');
+const checkEmployeeName = require('../utils/checkEmployeeName');
+
+const { 
+    uniqueWords,
+    descendingByIdx
+} = require('../utils');
 
 const {
     exchanged
 } = require('../utils/constants');
 
-const alias = 'nms';
+const alias = 'tpw';
 
 const command = {
-    name: 'nbemails',
-    description: "Show an employee's exchanged emails' statistics of specific period"
+    name: 'topwords',
+    description: "Displays the list of the 10 most used words in the emails subjects followed with the number and percentage of mail each word appears in"
 };
 
 const arguments = {
@@ -56,53 +60,48 @@ const action = (args, opts, logger) => {
     // start the spinner
     const spinner = ora(InfoMsg.Loading).start();
 
-    // intialisation
-    let sent = 0;
-    let received = 0;
+    const words = new Map();
 
     // create table, detect terminal's width and use the width and table head
     // to init a correct table
     const tb = new Table([
-        'Employee Name',
-        'Time Period',
-        'Sent Emails',
-        'Received Emails',
-        'Total of exchanged Emails'
+        'Rank',
+        'Word',
+        'Number of occurence'
     ]);
 
     // start to read file recursively
     FileWalker(args.dir, (err, absPath, data) => {
         // failed to read a file
         if (err) return logger.error(chalk.red(ErrMsg.IO_FAILED_TO_READ(absPath)));
-
+        
         // email parser instance
-        const emailParser = new EmailParser(data);
+        const emailParser = new EmailParser(data);        
         // parse email and return an Email instance
         const email = emailParser.parseAndCreateEmail();
-
-        // check date, if there is an error then bubble up
+        
         const rsDate = checkDateRange(email, opts, options);
         // check employee's name, if there is an error then bubble up
-        const rsEmployee = checkEmployeeName(email, args, arguments);
-
+        const rsEmployee = checkEmployeeName(email, args);        
+        
         // error
-        if (rsDate instanceof Error) 
+        if (rsDate instanceof Error)
             // stop spinner, log error, exit process
             spinner.stop(), logger.error(chalk.red(rsDate.message)), process.exit(1);
+        // error
         else if (rsEmployee instanceof Error) 
             // stop spinner, log error, exit process
             spinner.stop(), logger.error(chalk.red(rsEmployee.message)), process.exit(1);
         // no error
-        else if (rsDate) {
-            switch(rsEmployee) {
-            case exchanged.SENT:
-                sent += 1;
-                break;
-            case exchanged.RECEIVED:
-                received += 1;
-                break;
-            default:
-                break;
+        else {
+            if(rsEmployee === exchanged.SENT) {
+                uniqueWords(email.subject).forEach(w => {
+                    if (words.has(w)) {
+                        words.set(w, words.get(w) + 1);
+                    } else {
+                        words.set(w, 1);
+                    }
+                });
             }
         }
     }, () => {
@@ -112,13 +111,14 @@ const action = (args, opts, logger) => {
 
         // add a table row, every item must be string otherwise if fails to add
         // more info => Table.js
-        tb.push([
-            args.employee.trim(),
-            (opts.dateFrom || '').trim()  + ' - ' + (opts.dateTo || '').trim(),
-            sent.toString(),
-            received.toString(),
-            (sent + received).toString()
-        ]);
+        const wordsArray = [...words].sort(descendingByIdx(1)).slice(0, 10);
+        wordsArray.forEach((v, k) => {
+            tb.push([
+                (k+1).toString(),
+                v[0],
+                v[1].toString()
+            ]);
+        });
 
         // print table
         process.stdout.write(tb.toString());

@@ -1,19 +1,23 @@
 const loademails = require('./loademails');
 const nbemails = require('./nbemails');
-const buzzydays = require('./buzzydays');
+const busydays = require('./busydays');
 const topcontact = require('./topcontact');
 const freqemailuser = require('./freqemailuser');
-const nbemailsColab = require('./nbemailsColab');
-
+const nbemailscolab = require('./nbemailscolab');
+const searchbycriteria = require('./searchbycriteria');
+const topwords = require('./topwords');
+const emailsplot = require('./emailsplot');
 
 const subcmds = [
+    searchbycriteria,
     freqemailuser,
-    nbemailsColab,
+    nbemailscolab,
     loademails,
     nbemails,
-    buzzydays,
-    topcontact
-
+    busydays,
+    topcontact,
+    topwords,
+    emailsplot
 ];
 
 module.exports = subcmds;

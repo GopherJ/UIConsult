@@ -1,0 +1,53 @@
+{
+    "title": "",
+    "$schema": "https://vega.github.io/schema/vega-lite/v3.json",
+    "data": {
+        "values": []
+    },
+    "layer": [
+        {
+            "mark": "point",
+            "encoding": {
+                "x": {
+                    "title": "Date",
+                    "field": "sent",
+                    "timeUnit": "date",
+                    "type": "temporal"
+                },
+                "y": {
+                    "title": "Number Of Emails",
+                    "type": "quantitative",
+                    "aggregate": "count"
+                },
+                "size": {
+                    "value": 50
+                },
+                "color": {
+                    "value": "green"
+                }
+            }
+        },
+        {
+            "mark": "point",
+            "encoding": {
+                "x": {
+                    "title": "Date",
+                    "field": "recv",
+                    "timeUnit": "date",
+                    "type": "temporal"
+                },
+                "y": {
+                    "title": "Number Of Emails",
+                    "type": "quantitative",
+                    "aggregate": "count"
+                },
+                "size": {
+                    "value": 50
+                },
+                "color": {
+                    "value": "blue"
+                }
+            }
+        }
+    ]
+}

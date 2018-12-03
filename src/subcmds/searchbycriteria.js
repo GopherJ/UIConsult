@@ -1,50 +1,18 @@
 /**
- * SPEC_8
+ * SPEC_10
  */
 const cli = require('caporal');
 const chalk = require('chalk');
 const ora = require('ora');
-const fs = require('fs');
-const path = require('path');
 
-var vg = require('vega');
-var vegalite = require('vega-lite');
-
-const Open = require('../lib/Open');
 const FileWalker = require('../lib/FileWalker');
 const EmailParser = require('../lib/EmailParser');
+const EmailList = require('../lib/EmailList');
 
 const ErrMsg = require('../msg/ErrMsg');
 const InfoMsg = require('../msg/InfoMsg');
 
-var tb = [];
 const Tab = [];
-
-const chart =   {  
-        "data":{  
-           "values":[  
-     
-           ]
-        },
-        "mark":"circle",
-        "encoding":{  
-           "size":{  
-              "type":"quantitative",
-              "aggregate":"sum",
-              "field":"email"
-           },
-           "x":{  
-              "type":"ordinal",
-              "field":"date",
-              "timeUnit":"hours"
-           },
-           "y":{  
-              "type":"ordinal",
-              "field":"date",
-              "timeUnit":"day"
-           }
-        }
-     }
 
 const { 
     isInRange, 
@@ -55,11 +23,11 @@ const {
 } = require('../utils');
 
 
-const alias = 'fmu';
+const alias = 'sbc';
 
 const command = {
-    name: 'freqemailuser',
-    description: 'Access the frequency of a user’s sent emails on a period of time'
+    name: 'SearchByCriteria',
+    description: 'Email research per criteria'
 };
 
 const arguments = [
@@ -82,28 +50,29 @@ const options = {
     },
     n:{
         var: '-n, --name',
-        description: 'search by user name',
+        description: 'search for emails by user name',
         type: cli.BOOL
     },
     e:{
         var: '-email, --email',
-        description: 'search by email address',
+        description: 'search for emails by email address',
+        type: cli.BOOL
+    },
+    w:{
+        var: '-w, --word',
+        description: 'search for emails using a word',
         type: cli.BOOL
     },
     param: {
-        var: '-p, --param',
-        description: 'user name or addresse',
-        type: cli.STRING
-    },
-    file: {
-        var: '-f, --file',
-        description: 'The path where the chart will be stored(saved)',
+        var: '-e, --param',
+        description: 'user name, email adresse or a word',
         type: cli.STRING
     }
 };
 
+
 const parseDate = (dateStr, isDateFrom) => {
-    const re = /^\s*(?:([0-9]{1,2})\/)?(?:([0-9]{1,2})\/)?(?:([0-9]{4}))\s*$/;
+    const re = /^(?:([0-9]{1,2})\/)?(?:([0-9]{1,2})\/)?(?:([0-9]{4}))$/;
     const matches = dateStr.match(re);
     const VAR = isDateFrom ? options.dateFrom.var : options.dateTo.var;
 
@@ -134,6 +103,8 @@ const parseDate = (dateStr, isDateFrom) => {
     }
 };
 
+
+  
 const checkDateInRange = (email, options) => {
     const { dateFrom, dateTo } = options;
     const { date } = email;
@@ -163,47 +134,24 @@ const checkDateInRange = (email, options) => {
     return true;
 };
 
-const monthsMap = {
-    'Jan': 1,
-    'Feb': 2,
-    'Mar': 3,
-    'Apr': 4,
-    'May': 5,
-    'Jun': 6,
-    'Jul': 7,
-    'Aug': 8,
-    'Sep': 9,
-    'Oct': 10,
-    'Nov': 11,
-    'Dec': 12
-};
-
-function resultData(array) {
-    var i, j, len = array.length, out = [], obj = {};
-    for (i = 0; i < len; i++) {
-      obj[array[i]] = 0;
+function matchRecievers(a, b, c){
+if(c ==! null){
+    for(var i in a){
+        if(a[i].match(new RegExp(b, "i")) && a[i].match(new RegExp(c, "i")))
+        return true;
+        else return false;
     }
-    for (j in obj) {
-      var abc = {date:'', email:''};
-      abc.date = j;
-      var accurence = myMatch(array, j);
-      abc.email = accurence;
-      out.push(abc);
+}else{
+    for(var i in a){
+        if(a[i].match(new RegExp(b, "i")))
+        return true;
+        else return false;
     }
-    return out;
-  }
-  
-  function myMatch(array, word){
-    var abc = 0;
-    for(var i in array){
-        if(array[i].match(word)){
-            abc++;
-        }
-    }
-return abc;
+}
 }
 
 const action = (args, options, logger) => {
+    const emailList = new EmailList();
     const spinner = ora(InfoMsg.Loading).start();
 
     FileWalker(args.dir, (err, absPath, data) => {
@@ -219,28 +167,26 @@ const action = (args, options, logger) => {
     }, () => {
         
         var tmp = [];
-        var emaildate = 0;
         var sender = '';
-        var donnees = [];
+        var recievers = [];
+        var content = '';
+        
+
         if(options.email){
 
             for (var element in Tab){
                
-                emaildate = Tab[element].date;
                 sender = Tab[element].sender;
-                if(sender === options.param)
-                tmp.push(emaildate);
-               
+                recievers = Tab[element].receivers;
+
+                if(sender === options.param || (recievers.indexOf(options.param)) != -1 ){
+                tmp.push(Tab[element]);
+                emailList.push(Tab[element]);    
             }
-              
-            for(var element in tmp){
-                const splt2 = (String(tmp[element]).split(' '));
-                const date_1 = splt2[3]+'-'+monthsMap[splt2[1]]+'-'+splt2[2];
-                const date_2 = splt2[4];
-                const emailDateFinal = date_1+' '+date_2
-                tb.push(emailDateFinal);
-                  }
-                donnees = resultData(tb);
+             }
+             
+             spinner.stop();
+             process.stdout.write(emailList.toString());
 
 
         }else if (options.name){
@@ -249,57 +195,52 @@ const action = (args, options, logger) => {
             exp2 = exp[1];
 
             for (var element in Tab){
-                sender = Tab[element].sender;
-                emaildate = Tab[element].date;
-                if(sender.match(new RegExp(exp1, "i")) && sender.match(new RegExp(exp2, "i"))){
-                    tmp.push(emaildate);
-                }
+
+               sender = Tab[element].sender;
+               recievers = Tab[element].receivers;
+               content = Tab[element].content;
+
+                if(sender.match(new RegExp(exp1, "i")) && sender.match(new RegExp(exp2, "i"))||matchRecievers(recievers, exp1, exp2) || content.match(new RegExp(exp1, "i")) && content.match(new RegExp(exp2, "i"))){
+                    tmp.push(Tab[element]);
+                    emailList.push(Tab[element]);    
+
+                 }
+            }  
+            
+            spinner.stop();
+            process.stdout.write(emailList.toString());
+
+        }else if (options.word){
+
+            for (var element in Tab){
+
+            sender = Tab[element].sender;
+            recievers = Tab[element].receivers;
+            content = Tab[element].content;
+
+            if(sender.match(new RegExp(options.param, "i"))||matchRecievers(recievers, options.param, null) || content.match(new RegExp(options.param, "i"))){
+                
+                tmp.push(Tab[element]);
+                emailList.push(Tab[element]);
             }
-                tmp.sort(function(a, b) {
-                    return a - b;
-                  });
-
-            for(var element in tmp){
-                const splt2 = (String(tmp[element]).split(' '));
-                const date_1 = splt2[3]+'-'+monthsMap[splt2[1]]+'-'+splt2[2];
-                const date_2 = splt2[4];
-                const emailDateFinal = date_1+' '+date_2
-                tb.push(emailDateFinal);
-                  }
-                donnees = resultData(tb);
         }
+        
         spinner.stop();
+        process.stdout.write(emailList.toString());
 
-       chart['data']['values'] = donnees;
-    
-       const myChart = vegalite.compile(chart, {config: {background: "white"}}).spec;
-
-       /* SVG version */
-       var runtime = vg.parse(myChart);
-       var view = new vg.View(runtime).renderer('svg').run();
-       var mySvg = view.toSVG();
-       mySvg.then(function(res){
-
-           const dir = path.dirname(options.file);
-
-           fs.existsSync(dir) || fs.mkdirSync(dir);
-           fs.writeFileSync(options.file, res);
-           view.finalize();
-           Open(options.file);
-
-       });
-
+    }
     }, path => {
         spinner.stop();
         logger.error(chalk.red(ErrMsg.IO_PERMISSION_DENIED(path)));
     });
 
-};
+}
+;
 
 module.exports = {
     alias,
     command,
-    arguments,
+    arguments,  
     options,
     action
 };

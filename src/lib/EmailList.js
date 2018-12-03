@@ -3,14 +3,14 @@
  *
  * @Author: Cheng JIANG 
  * @Date: 2018-11-27 22:33:47 
- * @Last Modified by:   Cheng JIANG 
- * @Last Modified time: 2018-11-27 22:33:47 
+ * @Last Modified by: Cheng JIANG
+ * @Last Modified time: 2018-12-02 15:15:42
  */
 
 const Email = require('./Email');
 const Table = require('./Table');
 
-const { formatDate } = require('../utils');
+const { formatDateHour } = require('../utils');
 
 class EmailList {
     constructor() {
@@ -31,7 +31,7 @@ class EmailList {
 
             this.tb.push([
                 email.subject,
-                formatDate(email.date),
+                formatDateHour(email.date),
                 email.sender,
                 email.receivers.join('\n'),
                 email.content

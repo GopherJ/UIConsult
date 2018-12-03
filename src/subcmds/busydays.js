@@ -1,10 +1,7 @@
-/*
- * SPEC_2
- *
- * @Author: Cheng JIANG 
- * @Date: 2018-11-24 15:29:35 
- * @Last Modified by: Cheng JIANG
- * @Last Modified time: 2018-12-03 18:34:27
+/**
+ * SPEC_3
+ * 
+ * @author Cherchour Liece
  */
 const cli = require('caporal');
 const chalk = require('chalk');
@@ -12,20 +9,26 @@ const ora = require('ora');
 const FileWalker = require('../lib/FileWalker');
 const EmailParser = require('../lib/EmailParser');
 const Table = require('../lib/Table');
-const checkDateRange = require('../utils/checkDateRange');
-const checkEmployeeName = require('../utils/checkEmployeeName');
 const ErrMsg = require('../msg/ErrMsg');
 const InfoMsg = require('../msg/InfoMsg');
+const checkDateRange = require('../utils/checkDateRange');
+const checkEmployeeName = require('../utils/checkEmployeeName');
+
+const { 
+    isOutsideWorkingHours,
+    descendingByIdx,
+    formatDate
+} = require('../utils');
 
 const {
     exchanged
 } = require('../utils/constants');
 
-const alias = 'nms';
+const alias = 'bsd';
 
 const command = {
-    name: 'nbemails',
-    description: "Show an employee's exchanged emails' statistics of specific period"
+    name: 'busydays',
+    description: "Displays the list of the 10 days selected and the number of emails sent (outside working hours) for these days."
 };
 
 const arguments = {
@@ -56,18 +59,15 @@ const action = (args, opts, logger) => {
     // start the spinner
     const spinner = ora(InfoMsg.Loading).start();
 
-    // intialisation
-    let sent = 0;
-    let received = 0;
+    // initialisation
+    const busyDays = new Map();
 
     // create table, detect terminal's width and use the width and table head
     // to init a correct table
     const tb = new Table([
-        'Employee Name',
-        'Time Period',
-        'Sent Emails',
-        'Received Emails',
-        'Total of exchanged Emails'
+        'Rank',
+        'Day',
+        'Exchanged Emails'
     ]);
 
     // start to read file recursively
@@ -76,15 +76,15 @@ const action = (args, opts, logger) => {
         if (err) return logger.error(chalk.red(ErrMsg.IO_FAILED_TO_READ(absPath)));
 
         // email parser instance
-        const emailParser = new EmailParser(data);
+        const emailParser = new EmailParser(data);        
         // parse email and return an Email instance
         const email = emailParser.parseAndCreateEmail();
-
+        
         // check date, if there is an error then bubble up
-        const rsDate = checkDateRange(email, opts, options);
+        const rsDate = checkDateRange(email, opts, options);               
         // check employee's name, if there is an error then bubble up
-        const rsEmployee = checkEmployeeName(email, args, arguments);
-
+        const rsEmployee = checkEmployeeName(email, args);        
+        
         // error
         if (rsDate instanceof Error) 
             // stop spinner, log error, exit process
@@ -94,15 +94,13 @@ const action = (args, opts, logger) => {
             spinner.stop(), logger.error(chalk.red(rsEmployee.message)), process.exit(1);
         // no error
         else if (rsDate) {
-            switch(rsEmployee) {
-            case exchanged.SENT:
-                sent += 1;
-                break;
-            case exchanged.RECEIVED:
-                received += 1;
-                break;
-            default:
-                break;
+            if(rsEmployee == exchanged.SENT && isOutsideWorkingHours(email.date)) {
+                const date = formatDate(email.date);
+
+                if (busyDays.has(date))
+                    busyDays.set(date, busyDays.get(date) + 1);
+                else
+                    busyDays.set(date, 1);
             }
         }
     }, () => {
@@ -112,13 +110,15 @@ const action = (args, opts, logger) => {
 
         // add a table row, every item must be string otherwise if fails to add
         // more info => Table.js
-        tb.push([
-            args.employee.trim(),
-            (opts.dateFrom || '').trim()  + ' - ' + (opts.dateTo || '').trim(),
-            sent.toString(),
-            received.toString(),
-            (sent + received).toString()
-        ]);
+        const busyDaysArrays = [...busyDays].sort(descendingByIdx(1)).slice(0, 10);
+
+        busyDaysArrays.forEach((v, k) => {
+            tb.push([
+                (k+1).toString(),
+                v[0],
+                v[1].toString()
+            ]);
+        });
 
         // print table
         process.stdout.write(tb.toString());

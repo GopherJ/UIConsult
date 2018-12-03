@@ -1,8 +1,12 @@
 /**
  *  util functions
  * 
+ *  @author Cheng JIANG
+ * 
  */
 const dayjs = require('dayjs');
+const objectPath = require('object-path');
+const { timeUnitMap } = require('./constants');
 
 const isString = s => typeof s === 'string';
 const isEmptyString = s => isString(s) && s === '';
@@ -24,57 +28,35 @@ const isInRange = (arr, n)=> isArray(arr)
     && n >= arr[0] 
     && n <= arr[1];
 const lastDayOfMonth = (m, y) => new Date(y, m, 0).getDate();
-const formatDate = d => dayjs(d).format('YYYY-MMDD HH:mm:ss');
+const formatDateHour = d => dayjs(d).format('YYYY-MM-DD HH:mm:ss');
+const formatDate = d => dayjs(d).format('YYYY-MM-DD');
+const formatHour = d => dayjs(d).format('HH:mm:ss');
 const makeArray = (s, i) => new Array(s).fill(i);
-const getHour = e =>  {
-    let date = String(e.date);
-    //get hour in a mail in the hh:mm format
-    const re = /(?<=\s)[0-9]{2}:[0-9]{2}/;
-    return date.match(re)[0];
-}
-const getTodaysDate = e =>
-{
-    let date = String(e.date);
-    let re = /[\w]{3}\s[\w]{3}\s[0-9]{2}\s[0-9]{4}/;
-    return date.match(re)[0];
-    
-}
-const sortDescending = (a,b) => {
-        if (a[1] === b[1]) {
-            return 0;
-        }
-        else {
-            return (a[1] > b[1]) ? -1 : 1;
-        }
-}
+const ascending = (b, a) => b < a ? -1 : b > a ? 1 : b >= a ? 0 : NaN;
+const descending = (a, b) => b < a ? -1 : b > a ? 1 : b >= a ? 0 : NaN;
+const descendingByProp = p => ((a, b) => b[p] < a[p] ? -1 : b[p] > a[p] ? 1 : b[p] >= a[p] ? 0 : NaN);
+const ascendingByProp = p => ((b, a) => b[p] < a[p] ? -1 : b[p] > a[p] ? 1 : b[p] >= a[p] ? 0 : NaN);
+const descendingByIdx = p => ((a, b) => b[p] < a[p] ? -1 : b[p] > a[p] ? 1 : b[p] >= a[p] ? 0 : NaN);
+const isOutsideWorkingHours = d => !(isDate(d) && d.getHours() > 8 && d.getHours() < 22);
+const isTheSameStrIgnoreCase = (a, b) => isString(a) && isString(b) && a.toUpperCase() === b.toUpperCase();
+const words = s => isEmptyString(s)
+    ? []
+    : /[a-zA-Z]{2,}/.test(s)
+    ? s.match(/[a-zA-Z]{2,}/g)
+    : [];
+const uniqueWords = s => isEmptyString(s)
+    ? []
+    : /[a-zA-Z]{2,}/.test(s)
+    ? Array.from(new Set(s.match(/[a-zA-Z]{2,}/g))).filter(w => !['re', 'fw', 'fwd'].some(x => isTheSameStrIgnoreCase(w, x)))
+    : [];
+const diffOfSecs = (a, b) => !(isDate(a) && isDate(b))
+    ? 0
+    : Math.ceil(Math.abs(a.valueOf() - b.valueOf()) / 1000);
+const convTimeUnitCombToNum = s => !(/^\s*[1-9]([hmdwMy])\s*$/.test(s))
+    ? NaN
+    : s.match(/^\s*([1-9])([hmdwMy])\s*$/).slice(1).reduce((ite, cur) => (+ite) * timeUnitMap[cur]);
+const updateTimeUnit = (s, u) => isArrayAndHasLength(s.layer) && s.layer.forEach(l => objectPath.set(l, ['encoding', 'x', 'timeUnit'], u));
 
-const arrayOfReceiversName = e => { 
-    let test = /^.*(?=(\@))/;
-    let str = e.receivers.toString();
-    let affichage = str.split(',');
-    for(let i = 0; i < affichage.length ;i++)
-    {
-        if(!isNull(affichage[i].match(test)))
-        {
-            affichage[i] = affichage[i].match(test)[0];
-        }
-
-    }
-    return affichage;
-}
-const senderName = e => {
-    let test = /^.*(?=(\@))/;
-    return e.sender.match(test)[0];    
-}
-const sortDescendingTopContact =(a,b) =>
-{
-    if (a[3] === b[3]) {
-        return 0;
-    }
-    else {
-        return (a[3] > b[3]) ? -1 : 1;
-    }
-}
 module.exports = {
     isString,
     isEmptyString,
@@ -89,13 +71,20 @@ module.exports = {
     isFunction,
     isAllFuntion,
     isInRange,
+    isOutsideWorkingHours,
     lastDayOfMonth,
+    formatDateHour,
     formatDate,
+    formatHour,
     makeArray,
-    getHour,
-    getTodaysDate,
-    sortDescending,
-    arrayOfReceiversName,
-    senderName,
-    sortDescendingTopContact
+    ascending,
+    ascendingByProp,
+    descending,
+    descendingByProp,
+    descendingByIdx,
+    words,
+    uniqueWords,
+    diffOfSecs,
+    convTimeUnitCombToNum,
+    updateTimeUnit
 };
