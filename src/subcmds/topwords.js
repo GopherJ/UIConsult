@@ -1,8 +1,8 @@
 /**
  * SPEC_5
- * 
+ *
  * @author Cherchour Liece
- * 
+ *
  * Edit: Cheng JIANG
  */
 const cli = require('caporal');
@@ -16,10 +16,16 @@ const InfoMsg = require('../msg/InfoMsg');
 const checkDateRange = require('../utils/checkDateRange');
 const checkEmployeeName = require('../utils/checkEmployeeName');
 
-const { 
-    uniqueWords,
-    descendingByIdx
+const {
+    words,
+    percent,
+    descendingByIdxProp,
 } = require('../utils');
+
+const uni = {
+    UNIQ: Symbol(),
+    NUNIQ: Symbol()
+};
 
 const {
     exchanged
@@ -36,7 +42,7 @@ const arguments = {
     dir: {
         var: '<dir>',
         description: 'Directory where store emails'
-    }, 
+    },
     employee: {
         var: '<employee>',
         description: "Employee's fullname"
@@ -60,47 +66,56 @@ const action = (args, opts, logger) => {
     // start the spinner
     const spinner = ora(InfoMsg.Loading).start();
 
-    const words = new Map();
+    const wordsMap = new Map();
+    const { UNIQ, NUNIQ } = uni;
+    let wordCount = 0;
 
     // create table, detect terminal's width and use the width and table head
     // to init a correct table
     const tb = new Table([
         'Rank',
         'Word',
-        'Number of occurence'
+        'Number Of Occurence',
+        'Percentage Of Appearance'
     ]);
 
     // start to read file recursively
     FileWalker(args.dir, (err, absPath, data) => {
         // failed to read a file
         if (err) return logger.error(chalk.red(ErrMsg.IO_FAILED_TO_READ(absPath)));
-        
+
         // email parser instance
-        const emailParser = new EmailParser(data);        
+        const emailParser = new EmailParser(data);
         // parse email and return an Email instance
         const email = emailParser.parseAndCreateEmail();
-        
+
         const rsDate = checkDateRange(email, opts, options);
         // check employee's name, if there is an error then bubble up
-        const rsEmployee = checkEmployeeName(email, args);        
-        
+        const rsEmployee = checkEmployeeName(email, args);
+
         // error
         if (rsDate instanceof Error)
             // stop spinner, log error, exit process
             spinner.stop(), logger.error(chalk.red(rsDate.message)), process.exit(1);
         // error
-        else if (rsEmployee instanceof Error) 
+        else if (rsEmployee instanceof Error)
             // stop spinner, log error, exit process
             spinner.stop(), logger.error(chalk.red(rsEmployee.message)), process.exit(1);
         // no error
         else {
+            let lock = false;
             if(rsEmployee === exchanged.SENT) {
-                uniqueWords(email.subject).forEach(w => {
-                    if (words.has(w)) {
-                        words.set(w, words.get(w) + 1);
+                // Map {word => {nuniq, uniq}}
+                words(email.subject).forEach(w => {
+                    if (wordsMap.has(w)) {
+                        wordsMap.get(w)[NUNIQ] += 1;
+                        if (!lock) wordsMap.get(w)[UNIQ] += 1;
                     } else {
-                        words.set(w, 1);
+                        wordsMap.set(w, {[UNIQ]: 1, [NUNIQ]: 1});
                     }
+
+                    wordCount += 1;
+                    lock = true;
                 });
             }
         }
@@ -111,12 +126,14 @@ const action = (args, opts, logger) => {
 
         // add a table row, every item must be string otherwise if fails to add
         // more info => Table.js
-        const wordsArray = [...words].sort(descendingByIdx(1)).slice(0, 10);
+        const wordsArray = [...wordsMap].sort(descendingByIdxProp(1, UNIQ)).slice(0, 10);
+
         wordsArray.forEach((v, k) => {
             tb.push([
                 (k+1).toString(),
                 v[0],
-                v[1].toString()
+                v[1][UNIQ].toString(),
+                percent(v[1][NUNIQ], wordCount)
             ]);
         });
 

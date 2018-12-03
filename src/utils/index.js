@@ -43,13 +43,13 @@ const isOutsideWorkingHours = d => !(isDate(d) && d.getHours() > 8 && d.getHours
 const isTheSameStrIgnoreCase = (a, b) => isString(a) && isString(b) && a.toUpperCase() === b.toUpperCase();
 const words = s => isEmptyString(s)
     ? []
-    : /[a-zA-Z]{2,}/.test(s)
-    ? s.match(/[a-zA-Z]{2,}/g)
+    : /(([a-zA-Z]{2,})|([aI]))/.test(s)
+    ? s.match(/(([a-zA-Z]{2,})|([aI]))/g)
     : [];
 const uniqueWords = s => isEmptyString(s)
     ? []
-    : /[a-zA-Z]{2,}/.test(s)
-    ? Array.from(new Set(s.match(/[a-zA-Z]{2,}/g))).filter(w => !['re', 'fw', 'fwd'].some(x => isTheSameStrIgnoreCase(w, x)))
+    : /(([a-zA-Z]{2,})|([aI]))/.test(s)
+    ? Array.from(new Set(s.match(/(([a-zA-Z]{2,})|([aI]))/g))).filter(w => !['re', 'fw', 'fwd'].some(x => isTheSameStrIgnoreCase(w, x)))
     : [];
 const diffOfSecs = (a, b) => !(isDate(a) && isDate(b))
     ? 0
@@ -63,6 +63,7 @@ const parseEmployeeName = s => s.match(/^\s*(?:(?:([a-zA-Z0-9_-]+)(?:\s+)([a-zA-
 const parseEmailAddr = addr => isEmptyString(addr)
     ? ''
     : addr.replace(/@.*$/, '').split(/[\.]+/).join(' ');
+const percent = (v, t) => `${(v / t).toFixed(4) * 100}%`;
 
 module.exports = {
     isString,
@@ -97,5 +98,6 @@ module.exports = {
     convTimeUnitCombToNum,
     updateTimeUnit,
     parseEmployeeName,
-    parseEmailAddr
+    parseEmailAddr,
+    percent
 };
