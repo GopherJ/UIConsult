@@ -10,68 +10,100 @@ const {
 const ErrMsg = require('../msg/ErrMsg');
 
 /**
- * 
+ *
  * check if employee's name is included in email address
- * 
+ *
  * specified in caporal argument
- * 
- * @param {String} firstName 
- * @param {String} lastName 
- * @param {String} emailAddr 
+ *
+ * @param {String} firstName
+ * @param {String} lastName
+ * @param {String} emailAddr
  * @return {Boolean}
  */
 const testName = (firstName, lastName, emailAddr) => {
     const [
         firstNameUpper,
         lastNameUpper,
-        emailAddrUpper
-    ] = [firstName, lastName, emailAddr.replace(/@.*$/, '')]
-    .map(x => x.toUpperCase());
+    ] = emailAddr.replace(/@.*$/, '').split(/[\.]+/).map(x => x.toUpperCase());
 
-    return `${firstNameUpper}.${lastNameUpper}` === emailAddrUpper;
+    return firstName.toUpperCase() === firstNameUpper
+        && lastName.toUpperCase() === lastNameUpper;
 };
 
 /**
- * 
+ *
+ * check if employee's name is included in email address
+ *
+ * specified in caporal argument
+ *
+ * @param {String} fullname
+ * @param {String} emailAddr
+ * @return {Boolean}
+ */
+const testFullName = (fullname, emailAddr) => {
+    const [
+        fullnameUpper,
+        emailAddrUpper
+    ] = [fullname, emailAddr.replace(/@.*$/, '')]
+    .map(x => x.toUpperCase());
+
+    return fullnameUpper === emailAddrUpper;
+}
+
+/**
+ *
  * check if employee's name (parsed from caporal argument) is included
  * in an email's address.
- * 
+ *
  * the employee's name must be separated by one or more spaces
  * e.g. 'cheng jiang', 'cheng        jiang' are valid
- * 
+ *
  * however
  *  'cheng', 'jiang' are not valid, maybe later I can add support for this
- * 
+ *
  * if it's included in sender, then this function returns 'exchanged.SENT'
  * if it's included in some receiver's email address, then this function returns 'exchanged.RECEIVED'
  * otherwise, this function returns 'exchanged.NONE'
- * 
- * @param {Email} email 
- * @param {Caporal.arguments} args 
+ *
+ * @param {Email} email
+ * @param {Caporal.arguments} args
  * @return {exchanged | Error}
  */
 const checkEmployeeName = (email, args, arguments) => {
     const { employee } = args;
     const { sender, receivers } = email;
 
-    const re = /^\s*(?:(?:(\w+)(?:\s+)(\w+))|(?:(\w+)\.(\w+)@.+))\s*$/;
+    const re = /^\s*(?:(?:([a-zA-Z0-9_-]+)(?:\s+)([a-zA-Z0-9_-]+))|(?:([a-zA-Z0-9_-]+)[\.]+([a-zA-Z0-9_-]+)@[a-zA-Z0-9_]+?\.[a-zA-Z0-9]{2,3})|([a-zA-Z0-9_-]+)|(?:([a-zA-Z0-9_-]+)@[a-zA-Z0-9_]+?\.[a-zA-Z0-9]{2,3}))\s*$/;
     const matches = employee.match(re);
 
     // e.g 'cheng jiang' 'cheng.jiang@utt.fr' '  cheng  jiang  ' ' cheng.jiang@utt.fr '
+    // 'cheng@utt.fr' 'cheng' '    cheng'  '    cheng    '   'cheng    '
     if (!isNull(matches)) {
-        const [
-            firstName,
-            lastName
-        ] = matches.slice(1).filter(x => !isUndefined(x));
+        const groups = matches.slice(1).filter(x => !isUndefined(x));
 
-        if (testName(firstName, lastName, sender)) 
-            return exchanged.SENT;
-        else if (isArrayAndHasLength(receivers) && receivers.some(r => testName(firstName, lastName, r))) 
-            return exchanged.RECEIVED;
-        else 
-            return exchanged.NONE;
+        switch(groups.length) {
+        case 1:
+            const [fullname] = groups;
+            if (testFullName(fullname, sender))
+                return exchanged.SENT;
+            else if (isArrayAndHasLength(receivers) && receivers.some(r => testFullName(fullname, r)))
+                return exchanged.RECEIVED;
+            else
+                return exchanged.NONE;
+        case 2:
+            const [
+                firstName,
+                lastName
+            ] = groups;
+
+            if (testName(firstName, lastName, sender))
+                return exchanged.SENT;
+            else if (isArrayAndHasLength(receivers) && receivers.some(r => testName(firstName, lastName, r)))
+                return exchanged.RECEIVED;
+            else
+                return exchanged.NONE;
+        }
     } else {
-        // e.g. 'slkdjlsd'
         return new Error(ErrMsg.OPTION_INVALID_FORMAT(arguments.employee.var));
     }
 };
