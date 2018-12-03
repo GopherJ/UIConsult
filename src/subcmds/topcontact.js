@@ -1,8 +1,8 @@
 /**
  * SPEC_4
- * 
+ *
  * @author Cherchour Liece
- * 
+ *
  * Edit: Cheng JIANG
  */
 const cli = require('caporal');
@@ -16,8 +16,9 @@ const InfoMsg = require('../msg/InfoMsg');
 const checkDateRange = require('../utils/checkDateRange');
 const checkEmployeeName = require('../utils/checkEmployeeName');
 
-const { 
-    descendingByIdx
+const {
+    parseEmailAddr,
+    descendingByIdxProp
 } = require('../utils');
 
 const {
@@ -35,7 +36,7 @@ const arguments = {
     dir: {
         var: '<dir>',
         description: 'Directory where store emails'
-    }, 
+    },
     employee: {
         var: '<employee>',
         description: "Employee's fullname"
@@ -61,12 +62,15 @@ const action = (args, opts, logger) => {
 
     // initialisation
     const contacts = new Map();
+    const { SENT, RECEIVED, BOTH } = exchanged;
 
     // create table, detect terminal's width and use the width and table head
     // to init a correct table
     const tb = new Table([
         'Rank',
         'Employee Name',
+        'Sent Emails',
+        'Recv Emails',
         'Total of exchanged Emails'
     ]);
 
@@ -84,32 +88,31 @@ const action = (args, opts, logger) => {
         const rsDate = checkDateRange(email, opts, options);
         const rsEmployee = checkEmployeeName(email, args);
 
-        if (rsDate instanceof Error) 
+        if (rsDate instanceof Error)
             // stop spinner, log error, exit process
             spinner.stop(), logger.error(chalk.red(rsDate.message)), process.exit(1);
-        else if (rsEmployee instanceof Error) 
+        else if (rsEmployee instanceof Error)
             // stop spinner, log error, exit process
             spinner.stop(), logger.error(chalk.red(rsEmployee.message)), process.exit(1);
         // no error
         else {
             switch(rsEmployee) {
-            case exchanged.SENT: 
+            // Map {email_addr => {sent: a, recv: b, exchanged: c}}
+            case SENT:
                 email.receivers.forEach(addr => {
-                    if (contacts.has(addr)) {
-                        contacts.set(addr, contacts.get(addr) + 1);
-                    } else {
-                        contacts.set(addr, 1);
-                    }
+                if (contacts.has(addr))
+                    contacts.get(addr)[RECEIVED] += 1, contacts.get(addr)[BOTH] += 1;
+                else
+                    contacts.set(addr, {[RECEIVED]: 1, [BOTH]: 1, [SENT]: 0});
                 });
                 break;
-            case exchanged.RECEIVED:
+            case RECEIVED:
                 const { sender } = email;
 
-                if (contacts.has(sender)) {
-                    contacts.set(sender, contacts.get(sender) + 1);
-                } else {
-                    contacts.set(sender, 1);
-                }
+                if (contacts.has(sender))
+                    contacts.get(sender)[SENT] += 1, contacts.get(sender)[BOTH] += 1;
+                else
+                    contacts.set(sender, {[SENT]: 1, [BOTH]: 1, [RECEIVED]: 0});
                 break;
             default:
                 break;
@@ -122,12 +125,14 @@ const action = (args, opts, logger) => {
 
         // add a table row, every item must be string otherwise if fails to add
         // more info => Table.js
-        const contactsArray = [...contacts].sort(descendingByIdx(1)).slice(0, 10);
+        const contactsArray = [...contacts].sort(descendingByIdxProp(1, BOTH)).slice(0, 10);
         contactsArray.forEach((v, k) => {
             tb.push([
                 (k+1).toString(),
-                v[0],
-                v[1].toString()
+                parseEmailAddr(v[0]),
+                v[1][SENT].toString(),
+                v[1][RECEIVED].toString(),
+                v[1][BOTH].toString()
             ]);
         });
 

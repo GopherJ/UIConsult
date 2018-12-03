@@ -1,6 +1,7 @@
 exports.exchanged = {
     SENT: Symbol(),
     RECEIVED: Symbol(),
+    BOTH: Symbol(),
     NONE: Symbol()
 };
 
@@ -29,12 +30,12 @@ exports.timeUnitMap = {
 };
 
 exports.vegaTimeUnits = [
-    "yearmonthdatehours", 
+    "yearmonthdatehours",
     "yearmonthdatehoursminutes",
     "yearmonthdatehoursminutesseconds",
-    "quarter", 
+    "quarter",
     "quartermonth",
-    "month", 
+    "month",
     "monthdate",
     "date",
     "day",
@@ -45,5 +46,5 @@ exports.vegaTimeUnits = [
     "minutesseconds",
     "seconds",
     "secondsmilliseconds",
-    "milliseconds" 
+    "milliseconds"
 ];

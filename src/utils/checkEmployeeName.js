@@ -72,6 +72,7 @@ const testFullName = (fullname, emailAddr) => {
 const checkEmployeeName = (email, args, arguments) => {
     const { employee } = args;
     const { sender, receivers } = email;
+    const { SENT, RECEIVED, NONE } = exchanged;
 
     const re = /^\s*(?:(?:([a-zA-Z0-9_-]+)(?:\s+)([a-zA-Z0-9_-]+))|(?:([a-zA-Z0-9_-]+)[\.]+([a-zA-Z0-9_-]+)@[a-zA-Z0-9_]+?\.[a-zA-Z0-9]{2,3})|([a-zA-Z0-9_-]+)|(?:([a-zA-Z0-9_-]+)@[a-zA-Z0-9_]+?\.[a-zA-Z0-9]{2,3}))\s*$/;
     const matches = employee.match(re);
@@ -85,11 +86,11 @@ const checkEmployeeName = (email, args, arguments) => {
         case 1:
             const [fullname] = groups;
             if (testFullName(fullname, sender))
-                return exchanged.SENT;
+                return SENT;
             else if (isArrayAndHasLength(receivers) && receivers.some(r => testFullName(fullname, r)))
-                return exchanged.RECEIVED;
+                return RECEIVED;
             else
-                return exchanged.NONE;
+                return NONE;
         case 2:
             const [
                 firstName,
@@ -97,11 +98,11 @@ const checkEmployeeName = (email, args, arguments) => {
             ] = groups;
 
             if (testName(firstName, lastName, sender))
-                return exchanged.SENT;
+                return SENT;
             else if (isArrayAndHasLength(receivers) && receivers.some(r => testName(firstName, lastName, r)))
-                return exchanged.RECEIVED;
+                return RECEIVED;
             else
-                return exchanged.NONE;
+                return NONE;
         }
     } else {
         return new Error(ErrMsg.OPTION_INVALID_FORMAT(arguments.employee.var));

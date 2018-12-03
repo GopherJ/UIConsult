@@ -36,7 +36,9 @@ const ascending = (b, a) => b < a ? -1 : b > a ? 1 : b >= a ? 0 : NaN;
 const descending = (a, b) => b < a ? -1 : b > a ? 1 : b >= a ? 0 : NaN;
 const descendingByProp = p => ((a, b) => b[p] < a[p] ? -1 : b[p] > a[p] ? 1 : b[p] >= a[p] ? 0 : NaN);
 const ascendingByProp = p => ((b, a) => b[p] < a[p] ? -1 : b[p] > a[p] ? 1 : b[p] >= a[p] ? 0 : NaN);
-const descendingByIdx = p => ((a, b) => b[p] < a[p] ? -1 : b[p] > a[p] ? 1 : b[p] >= a[p] ? 0 : NaN);
+const descendingByIdx = i => ((a, b) => b[i] < a[i] ? -1 : b[i] > a[i] ? 1 : b[i] >= a[i] ? 0 : NaN);
+const descendingByIdxIdx = (i1, i2) => ((a, b) => b[i1][i2] < a[i1][i2] ? -1 : b[i1][i2] > a[i1][i2] ? 1 : b[i1][i2] >= a[i1][i2] ? 0 : NaN);
+const descendingByIdxProp = (i, p) => ((a, b) => b[i][p] < a[i][p] ? -1 : b[i][p] > a[i][p] ? 1 : b[i][p] >= a[i][p] ? 0 : NaN);
 const isOutsideWorkingHours = d => !(isDate(d) && d.getHours() > 8 && d.getHours() < 22);
 const isTheSameStrIgnoreCase = (a, b) => isString(a) && isString(b) && a.toUpperCase() === b.toUpperCase();
 const words = s => isEmptyString(s)
@@ -57,7 +59,10 @@ const convTimeUnitCombToNum = s => !(/^\s*[1-9]([hmdwMy])\s*$/.test(s))
     : s.match(/^\s*([1-9])([hmdwMy])\s*$/).slice(1).reduce((ite, cur) => (+ite) * timeUnitMap[cur]);
 const updateTimeUnit = (s, u) => isArrayAndHasLength(s.layer) && s.layer.forEach(l => objectPath.set(l, ['encoding', 'x', 'timeUnit'], u));
 const parseEmployeeName = s => s.match(/^\s*(?:(?:([a-zA-Z0-9_-]+)(?:\s+)([a-zA-Z0-9_-]+))|(?:([a-zA-Z0-9_-]+)[\.]+([a-zA-Z0-9_-]+)@[a-zA-Z0-9_]+?\.[a-zA-Z0-9]{2,3})|([a-zA-Z0-9_-]+)|(?:([a-zA-Z0-9_-]+)@[a-zA-Z0-9_]+?\.[a-zA-Z0-9]{2,3}))\s*$/)
-    .slice(1).filter(x => !isUndefined(x)).join('.');
+    .slice(1).filter(x => !isUndefined(x)).join(' ');
+const parseEmailAddr = addr => isEmptyString(addr)
+    ? ''
+    : addr.replace(/@.*$/, '').split(/[\.]+/).join(' ');
 
 module.exports = {
     isString,
@@ -84,10 +89,13 @@ module.exports = {
     descending,
     descendingByProp,
     descendingByIdx,
+    descendingByIdxIdx,
+    descendingByIdxProp,
     words,
     uniqueWords,
     diffOfSecs,
     convTimeUnitCombToNum,
     updateTimeUnit,
-    parseEmployeeName
+    parseEmployeeName,
+    parseEmailAddr
 };
