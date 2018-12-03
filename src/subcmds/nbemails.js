@@ -1,8 +1,8 @@
 /*
  * SPEC_2
  *
- * @Author: Cheng JIANG 
- * @Date: 2018-11-24 15:29:35 
+ * @Author: Cheng JIANG
+ * @Date: 2018-11-24 15:29:35
  * @Last Modified by: Cheng JIANG
  * @Last Modified time: 2018-12-03 18:34:27
  */
@@ -18,6 +18,9 @@ const ErrMsg = require('../msg/ErrMsg');
 const InfoMsg = require('../msg/InfoMsg');
 
 const {
+    parseEmployeeName
+} = require('../utils');
+const {
     exchanged
 } = require('../utils/constants');
 
@@ -32,7 +35,7 @@ const arguments = {
     dir: {
         var: '<dir>',
         description: 'Directory where store emails'
-    }, 
+    },
     employee: {
         var: '<employee>',
         description: "Employee's fullname"
@@ -86,10 +89,10 @@ const action = (args, opts, logger) => {
         const rsEmployee = checkEmployeeName(email, args, arguments);
 
         // error
-        if (rsDate instanceof Error) 
+        if (rsDate instanceof Error)
             // stop spinner, log error, exit process
             spinner.stop(), logger.error(chalk.red(rsDate.message)), process.exit(1);
-        else if (rsEmployee instanceof Error) 
+        else if (rsEmployee instanceof Error)
             // stop spinner, log error, exit process
             spinner.stop(), logger.error(chalk.red(rsEmployee.message)), process.exit(1);
         // no error
@@ -113,7 +116,7 @@ const action = (args, opts, logger) => {
         // add a table row, every item must be string otherwise if fails to add
         // more info => Table.js
         tb.push([
-            args.employee.trim(),
+            parseEmployeeName(args.employee),
             (opts.dateFrom || '').trim()  + ' - ' + (opts.dateTo || '').trim(),
             sent.toString(),
             received.toString(),

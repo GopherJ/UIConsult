@@ -1,8 +1,8 @@
 /**
  *  util functions
- * 
+ *
  *  @author Cheng JIANG
- * 
+ *
  */
 const dayjs = require('dayjs');
 const objectPath = require('object-path');
@@ -21,11 +21,11 @@ const isArrayAndHasLength = arr => Array.isArray && arr.length > 0;
 const isFunction = f => typeof f === 'function';
 const isAllFuntion = arr => isArray(arr) && arr.every(f => isFunction(f));
 const isAll = (arr, det) => isArrayAndHasLength(arr) && isFunction(det) && arr.every(x => det(x));
-const isInRange = (arr, n)=> isArray(arr) 
-    && arr.length === 2 
+const isInRange = (arr, n)=> isArray(arr)
+    && arr.length === 2
     && arr.every(x => isNumber(x))
-    && isNumber(n) 
-    && n >= arr[0] 
+    && isNumber(n)
+    && n >= arr[0]
     && n <= arr[1];
 const lastDayOfMonth = (m, y) => new Date(y, m, 0).getDate();
 const formatDateHour = d => dayjs(d).format('YYYY-MM-DD HH:mm:ss');
@@ -56,6 +56,8 @@ const convTimeUnitCombToNum = s => !(/^\s*[1-9]([hmdwMy])\s*$/.test(s))
     ? NaN
     : s.match(/^\s*([1-9])([hmdwMy])\s*$/).slice(1).reduce((ite, cur) => (+ite) * timeUnitMap[cur]);
 const updateTimeUnit = (s, u) => isArrayAndHasLength(s.layer) && s.layer.forEach(l => objectPath.set(l, ['encoding', 'x', 'timeUnit'], u));
+const parseEmployeeName = s => s.match(/^\s*(?:(?:([a-zA-Z0-9_-]+)(?:\s+)([a-zA-Z0-9_-]+))|(?:([a-zA-Z0-9_-]+)[\.]+([a-zA-Z0-9_-]+)@[a-zA-Z0-9_]+?\.[a-zA-Z0-9]{2,3})|([a-zA-Z0-9_-]+)|(?:([a-zA-Z0-9_-]+)@[a-zA-Z0-9_]+?\.[a-zA-Z0-9]{2,3}))\s*$/)
+    .slice(1).filter(x => !isUndefined(x)).join('.');
 
 module.exports = {
     isString,
@@ -86,5 +88,6 @@ module.exports = {
     uniqueWords,
     diffOfSecs,
     convTimeUnitCombToNum,
-    updateTimeUnit
+    updateTimeUnit,
+    parseEmployeeName
 };
