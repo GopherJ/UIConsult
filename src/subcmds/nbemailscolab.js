@@ -14,6 +14,7 @@ const generateAndOpenChart = require('../lib/GenerateAndOpenChart');
 const checkExt = require('../utils/checkExt');
 
 const {
+    isUndefined,
     parseEmailAddr
 } = require('../utils');
 
@@ -54,13 +55,15 @@ const action = (args, opts, logger) => {
     const m = new Map();
 
     FileWalker(args.dir, (err, absPath, data) => {
-        if (err) return logger.error(chalk.red(ErrMsg.IO_FAILED_TO_READ(absPath)));
+        if (err) spinner.stop(), logger.error(chalk.red(ErrMsg.IO_FAILED_TO_READ(absPath))), process.exit(1);
+        if (isUndefined(opts.file)) spinner.stop(), logger.error(chalk.red(ErrMsg.OPTION_IS_REQUIRED(options.file.var))), process.exit(1);
 
         const emailParser = new EmailParser(data);
         const email = emailParser.parseAndCreateEmail();
 
         const rsDate = checkDateRange(email, opts, options);
         const rsExt = checkExt(opts.file, options);
+
         if (rsDate instanceof Error) spinner.stop(), logger.error(chalk.red(rsDate.message)), process.exit(1);
         else if (rsExt instanceof Error) spinner.stop(), logger.error(chalk.red(rsExt.message)), process.exit(1)
         else m.has(email.sender) ? m.set(email.sender, m.get(email.sender) + 1) : m.set(email.sender, 1);
