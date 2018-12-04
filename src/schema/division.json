@@ -1,6 +1,5 @@
 {
-    "title": "",
-    "$schema": "https://vega.github.io/schema/vega-lite/v3.json",
+    "title": "Repartition Of Sent Mails",
     "data": {
         "values": []
     },
@@ -8,13 +7,12 @@
     "encoding": {
         "x": {
             "title": "Employee's Name",
-            "timeUnit": "day",
-            "field": "date",
-            "type": "temporal"
+            "field": "employee",
+            "type": "nominal"
         },
         "y": {
             "title": "Number Of Sent Emails",
-            "aggregate": "count",
+            "field": "sent",
             "type": "quantitative"
         }
     }

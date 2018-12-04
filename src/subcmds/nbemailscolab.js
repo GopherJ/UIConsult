@@ -4,14 +4,18 @@
 const cli = require('caporal');
 const chalk = require('chalk');
 const ora = require('ora');
-const path = require('path');
 const FileWalker = require('../lib/FileWalker');
 const EmailParser = require('../lib/EmailParser');
 const ErrMsg = require('../msg/ErrMsg');
 const InfoMsg = require('../msg/InfoMsg');
 const checkDateRange = require('../utils/checkDateRange');
 const schema = require('../schema/division');
-const generateChart = require('../lib/GenerateChart');
+const generateAndOpenChart = require('../lib/GenerateAndOpenChart');
+const checkExt = require('../utils/checkExt');
+
+const {
+    parseEmailAddr
+} = require('../utils');
 
 const alias = 'nbmc';
 
@@ -38,16 +42,6 @@ const options = {
         description: 'End date',
         type: cli.STRING
     },
-    day: {
-        var: '-d, --day',
-        description: 'Search for the nomber of emails per day',
-        type: cli.BOOL
-    },
-    month: {
-        var: '-m, --month',
-        description: 'Search for the number of emails per month',
-        type: cli.BOOL
-    },
     file: {
         var: '-f, --file',
         description: 'The path where the chart will be stored(saved)',
@@ -57,7 +51,7 @@ const options = {
 
 const action = (args, opts, logger) => {
     const spinner = ora(InfoMsg.Loading).start();
-    const dates = [];
+    const m = new Map();
 
     FileWalker(args.dir, (err, absPath, data) => {
         if (err) return logger.error(chalk.red(ErrMsg.IO_FAILED_TO_READ(absPath)));
@@ -65,23 +59,18 @@ const action = (args, opts, logger) => {
         const emailParser = new EmailParser(data);
         const email = emailParser.parseAndCreateEmail();
 
-        const rs = checkDateRange(email, opts, options);
-        if (rs instanceof Error) spinner.stop(), logger.error(chalk.red(rs.message)), process.exit(1);
-        else {
-            dates.push(email.date.valueOf());
-        }
+        const rsDate = checkDateRange(email, opts, options);
+        const rsExt = checkExt(opts.file, options);
+        if (rsDate instanceof Error) spinner.stop(), logger.error(chalk.red(rsDate.message)), process.exit(1);
+        else if (rsExt instanceof Error) spinner.stop(), logger.error(chalk.red(rsExt.message)), process.exit(1)
+        else m.has(email.sender) ? m.set(email.sender, m.get(email.sender) + 1) : m.set(email.sender, 1);
     }, () => {
         spinner.stop();
 
-        if(opts.day){
-            daySchema['data']['values'] = data;
-            generateChart(data, opts.path);
-        } else if(opts.month){
-            monthSchema['data']['values'] = donnees;
-            generateChart(data, opts.path);
-        }
+        schema['data']['values'] = [...m].map(x =>({employee: parseEmailAddr(x[0]), sent: x[1]}));
+        generateAndOpenChart(schema, opts.file);
     }, path => {
-        spinner.stop();     
+        spinner.stop();
         logger.error(chalk.red(ErrMsg.IO_PERMISSION_DENIED(path)));
     });
 };
