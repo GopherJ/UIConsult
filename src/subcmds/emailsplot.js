@@ -1,8 +1,8 @@
 /**
  * SPEC_6
- * 
+ *
  * @author Cherchour Liece
- * 
+ *
  * Edit: Cheng JIANG
  */
 const cli = require('caporal');
@@ -18,6 +18,7 @@ const schema = require('../schema/exchanged');
 const createServerWithSchema = require('../lib/HttpServer');
 const {
     isUndefined,
+    parseEmployeeName,
     updateTimeUnit
 } = require('../utils');
 const {
@@ -36,7 +37,7 @@ const arguments = {
     dir: {
         var: '<dir>',
         description: 'Directory where store emails'
-    }, 
+    },
     employee: {
         var: '<employee>',
         description: "Employee's fullname"
@@ -57,7 +58,8 @@ const options = {
     frequency: {
         var: '-f, --frequency',
         description: 'Frequency (time unit)',
-        type: cli.STRING
+        type: cli.STRING,
+        default: 'monthdate'
     }
 };
 
@@ -67,6 +69,7 @@ const action = (args, opts, logger) => {
 
     // initialisation
     const exchangedEmails = [];
+    const { SENT, RECEIVED } = exchanged;
 
     // create table, detect terminal's width and use the width and table head
     // to init a correct table
@@ -77,39 +80,41 @@ const action = (args, opts, logger) => {
         if (err) return logger.error(chalk.red(ErrMsg.IO_FAILED_TO_READ(absPath)));
 
         // email parser instance
-        const emailParser = new EmailParser(data);        
+        const emailParser = new EmailParser(data);
         // parse email and return an Email instance
         const email = emailParser.parseAndCreateEmail();
-        
+
         const rsDate = checkDateRange(email, opts, options);
         // check employee's name, if there is an error then bubble up
-        const rsEmployee = checkEmployeeName(email, args);    
+        const rsEmployee = checkEmployeeName(email, args);
         // error
-        if (rsDate instanceof Error) 
+        if (rsDate instanceof Error)
             // stop spinner, log error, exit process
             spinner.stop(), logger.error(chalk.red(rsDate.message)), process.exit(1);
-        else if (rsEmployee instanceof Error) 
+        else if (rsEmployee instanceof Error)
             // stop spinner, log error, exit process
             spinner.stop(), logger.error(chalk.red(rsEmployee.message)), process.exit(1);
         // no error
-        else if (!isUndefined(opts.frequency) && !vegaTimeUnits.includes(opts.frequency)) {
+        else if (!vegaTimeUnits.includes(opts.frequency)) {
             spinner.stop(), logger.error(chalk.red(ErrMsg.OPTION_INVALID_FORMAT(options.frequency.var))), process.exit(1);
         }
         else {
             updateTimeUnit(schema, opts.frequency);
 
             switch(rsEmployee) {
-            case exchanged.SENT:
+            case SENT:
                 exchangedEmails.push({
-                    sent: email.date.valueOf()
+                    date: email.date.valueOf(),
+                    exchanged: 'Sent'
                 });
                 break;
-            case exchanged.RECEIVED:
+            case RECEIVED:
                 exchangedEmails.push({
-                    recv: email.date.valueOf()
+                    date: email.date.valueOf(),
+                    exchanged: 'Recv'
                 });
                 break;
-            case exchanged.NONE:
+            default:
                 break;
             };
         }
@@ -118,6 +123,7 @@ const action = (args, opts, logger) => {
         // stop spinner
         spinner.stop();
         //Svg
+        schema['title']= `${parseEmployeeName(args.employee)}'s communication activity`
         schema['data']['values'] = exchangedEmails;
         createServerWithSchema(schema);
     }, path => {
@@ -132,7 +138,7 @@ const action = (args, opts, logger) => {
 module.exports = {
     alias,
     command,
-    arguments,  
+    arguments,
     options,
     action
 };
