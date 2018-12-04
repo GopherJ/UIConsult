@@ -8,6 +8,8 @@
 const cli = require('caporal');
 const chalk = require('chalk');
 const ora = require('ora');
+const fs = require('fs');
+const path = require('path');
 const FileWalker = require('../lib/FileWalker');
 const EmailParser = require('../lib/EmailParser');
 const ErrMsg = require('../msg/ErrMsg');
@@ -15,9 +17,8 @@ const InfoMsg = require('../msg/InfoMsg');
 const checkDateRange = require('../utils/checkDateRange');
 const checkEmployeeName = require('../utils/checkEmployeeName');
 const schema = require('../schema/exchanged');
-const createServerWithSchema = require('../lib/HttpServer');
+const Open = require('../lib/Open');
 const {
-    isUndefined,
     parseEmployeeName,
     updateTimeUnit
 } = require('../utils');
@@ -125,7 +126,17 @@ const action = (args, opts, logger) => {
         //Svg
         schema['title']= `${parseEmployeeName(args.employee)}'s communication activity`
         schema['data']['values'] = exchangedEmails;
-        createServerWithSchema(schema);
+
+        const indexPath = path.join(__dirname, '..', 'views', 'index.html');
+        fs.readFile(indexPath, 'utf8', (err, data) => {
+            if (err)
+                process.stderr.write(err.message);
+            else
+                fs.writeFile(
+                    indexPath,
+                    data.replace(/(<script id="vega">)[\s\S]*(<\/script>)/, `$1const vlSpec=${JSON.stringify(schema)};vegaEmbed("#vis", vlSpec, {defaultStyle: true});$2`),
+                    err => err ? process.stderr.write(err.message) : Open(indexPath));
+        });
     }, path => {
         // file walker ends with an error of permission
         // it fails to read a directory
