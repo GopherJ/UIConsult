@@ -9,7 +9,7 @@ const EmailParser = require('../lib/EmailParser');
 const ErrMsg = require('../msg/ErrMsg');
 const InfoMsg = require('../msg/InfoMsg');
 const checkDateRange = require('../utils/checkDateRange');
-const schema = require('../schema/division');
+const schema = require('../schema/repartition');
 const generateAndOpenChart = require('../lib/GenerateAndOpenChart');
 const checkExt = require('../utils/checkExt');
 
@@ -51,21 +51,23 @@ const options = {
 };
 
 const action = (args, opts, logger) => {
+    if (isUndefined(opts.file)) logger.error(chalk.red(ErrMsg.OPTION_IS_REQUIRED(options.file.var))), process.exit(1);
+
+    const rsExt = checkExt(opts.file, options);
+    if (rsExt instanceof Error) logger.error(chalk.red(rsExt.message)), process.exit(1)
+
     const spinner = ora(InfoMsg.Loading).start();
     const m = new Map();
 
     FileWalker(args.dir, (err, absPath, data) => {
-        if (err) spinner.stop(), logger.error(chalk.red(ErrMsg.IO_FAILED_TO_READ(absPath))), process.exit(1);
-        if (isUndefined(opts.file)) spinner.stop(), logger.error(chalk.red(ErrMsg.OPTION_IS_REQUIRED(options.file.var))), process.exit(1);
+        if (err) return logger.error(chalk.red(ErrMsg.IO_FAILED_TO_READ(absPath)));
 
         const emailParser = new EmailParser(data);
         const email = emailParser.parseAndCreateEmail();
 
         const rsDate = checkDateRange(email, opts, options);
-        const rsExt = checkExt(opts.file, options);
 
         if (rsDate instanceof Error) spinner.stop(), logger.error(chalk.red(rsDate.message)), process.exit(1);
-        else if (rsExt instanceof Error) spinner.stop(), logger.error(chalk.red(rsExt.message)), process.exit(1)
         else m.has(email.sender) ? m.set(email.sender, m.get(email.sender) + 1) : m.set(email.sender, 1);
     }, () => {
         spinner.stop();

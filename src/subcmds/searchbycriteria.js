@@ -45,9 +45,9 @@ const options = {
         description: 'End date',
         type: cli.STRING
     },
-    name: {
-        var: '--name',
-        description: "search for emails by name",
+    employee: {
+        var: '--employee',
+        description: "search for emails by employee's name",
         type: cli.STRING
     },
     content: {
@@ -67,7 +67,7 @@ const action = (args, opts, logger) => {
     const emailList = new EmailList();
 
     FileWalker(args.dir, (err, absPath, data) => {
-        if (err) spinner.stop(), logger.error(chalk.red(ErrMsg.IO_FAILED_TO_READ(absPath))), process.exit(1);
+        if (err) return logger.error(chalk.red(ErrMsg.IO_FAILED_TO_READ(absPath)));
 
         const emailParser = new EmailParser(data);
         const email = emailParser.parseAndCreateEmail();

@@ -70,12 +70,12 @@ const testFullName = (fullname, emailAddr) => {
  * @return {exchanged | Error}
  */
 const checkEmployeeNameInOption = (email, opts, options) => {
-    const { name } = opts;
+    const { employee } = opts;
     const { sender, receivers } = email;
     const { SENT, RECEIVED, NONE } = exchanged;
 
     const re = /^\s*(?:(?:([a-zA-Z0-9_-]+)(?:\s+)([a-zA-Z0-9_-]+))|(?:([a-zA-Z0-9_-]+)[\.]+([a-zA-Z0-9_-]+)@[a-zA-Z0-9_]+?\.[a-zA-Z0-9]{2,3})|([a-zA-Z0-9_-]+)|(?:([a-zA-Z0-9_-]+)@[a-zA-Z0-9_]+?\.[a-zA-Z0-9]{2,3}))\s*$/;
-    const matches = name.match(re);
+    const matches = employee.match(re);
 
     // e.g 'cheng jiang' 'cheng.jiang@utt.fr' '  cheng  jiang  ' ' cheng.jiang@utt.fr '
     // 'cheng@utt.fr' 'cheng' '    cheng'  '    cheng    '   'cheng    '
@@ -105,7 +105,7 @@ const checkEmployeeNameInOption = (email, opts, options) => {
                 return NONE;
         }
     } else {
-        return new Error(ErrMsg.OPTION_INVALID_FORMAT(options.name.var));
+        return new Error(ErrMsg.OPTION_INVALID_FORMAT(options.employee.var));
     }
 };
 
