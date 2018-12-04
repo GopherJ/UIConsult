@@ -14,9 +14,6 @@ dist/
 # Vscode
 .vscode/
 
-# executables
-bin/
-
 # Runtime data
 pids
 *.pid

@@ -1,0 +1,25 @@
+{
+    "title": "",
+   "data":{
+      "values":[
+
+      ]
+   },
+   "mark":"circle",
+   "encoding":{
+      "size":{
+         "type":"quantitative",
+         "aggregate":"count"
+      },
+      "x":{
+         "type":"ordinal",
+         "field":"date",
+         "timeUnit":"hours"
+      },
+      "y":{
+         "type":"ordinal",
+         "field":"date",
+         "timeUnit":"day"
+      }
+   }
+}

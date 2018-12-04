@@ -33,5 +33,8 @@
         "vega-embed": "^3.23.1",
         "vega-lite": "^3.0.0-rc8",
         "walk": "^2.3.14"
+    },
+    "pkg": {
+        "assets": ["views/**/*"]
     }
 }
