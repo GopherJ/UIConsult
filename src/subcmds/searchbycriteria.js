@@ -4,29 +4,26 @@
 const cli = require('caporal');
 const chalk = require('chalk');
 const ora = require('ora');
-
 const FileWalker = require('../lib/FileWalker');
 const EmailParser = require('../lib/EmailParser');
 const EmailList = require('../lib/EmailList');
-
 const ErrMsg = require('../msg/ErrMsg');
 const InfoMsg = require('../msg/InfoMsg');
+const checkDateRange = require('../utils/checkDateRange');
+const checkEmployeeNameInOption = require('../utils/checkEmployeeNameInOption');
+const checkSubjectAndContent = require('../utils/checkSubjectAndContent');
 
-const Tab = [];
-
-const { 
-    isInRange, 
-    isNull, 
-    isUndefined,
-    lastDayOfMonth, 
-    isNumber
+const {
+    isUndefined
 } = require('../utils');
-
+const {
+    exchanged
+} = require('../utils/constants');
 
 const alias = 'sbc';
 
 const command = {
-    name: 'SearchByCriteria',
+    name: 'searchbycriteria',
     description: 'Email research per criteria'
 };
 
@@ -48,199 +45,56 @@ const options = {
         description: 'End date',
         type: cli.STRING
     },
-    n:{
-        var: '-n, --name',
-        description: 'search for emails by user name',
-        type: cli.BOOL
+    name: {
+        var: '--name',
+        description: "search for emails by name",
+        type: cli.STRING
     },
-    e:{
-        var: '-email, --email',
-        description: 'search for emails by email address',
-        type: cli.BOOL
+    content: {
+        var: '--content',
+        description: "search for emails by content",
+        type: cli.STRING
     },
-    w:{
-        var: '-w, --word',
-        description: 'search for emails using a word',
-        type: cli.BOOL
-    },
-    param: {
-        var: '-e, --param',
-        description: 'user name, email adresse or a word',
+    subject: {
+        var: '--subject',
+        description: "search for emails by subject",
         type: cli.STRING
     }
 };
 
-
-const parseDate = (dateStr, isDateFrom) => {
-    const re = /^(?:([0-9]{1,2})\/)?(?:([0-9]{1,2})\/)?(?:([0-9]{4}))$/;
-    const matches = dateStr.match(re);
-    const VAR = isDateFrom ? options.dateFrom.var : options.dateTo.var;
-
-    if (!isNull(matches)) {
-        const [
-            d,
-            m,
-            y
-        ] = matches.slice(1).map(x => +x);
-
-        if (!isNumber(m) && !isNumber(d)) {
-            return new Date(y, 0);
-        } else if (!isNumber(m)) {
-            if (!isInRange([1, 12], d)) {
-                return new Error(ErrMsg.OPTION_OUT_OF_RANGE(VAR));
-            } else {
-                return new Date(y, d - 1, 0);
-            }
-        } else {
-            if (!isInRange([1, lastDayOfMonth(m, y)], d) || !isInRange([1, 12], m)) {
-                return new Error(ErrMsg.OPTION_OUT_OF_RANGE(VAR));
-            } else {
-                return new Date(y, m - 1, d);
-            }
-        }
-    } else {
-        return new Error(ErrMsg.OPTION_INVALID_FORMAT(VAR));
-    }
-};
-
-
-  
-const checkDateInRange = (email, options) => {
-    const { dateFrom, dateTo } = options;
-    const { date } = email;
-
-    if (isUndefined(dateFrom) && isUndefined(dateTo)) {
-        return true;
-    } else if (isUndefined(dateTo)) {
-        const rs = parseDate(dateFrom, true);
-
-        if (rs instanceof Error) return rs;
-        if(rs > date) return false;
-        return true;
-    } else if (isUndefined(dateFrom)) {
-        const rs = parseDate(dateTo, false);
-
-        if (rs instanceof Error) return rs;
-        if(rs < date) return false;
-        return true;
-    }
-
-    const rsFrom = parseDate(dateFrom, true);
-    const rsTo = parseDate(dateTo, false);
-
-    if (rsFrom instanceof Error) return rsFrom;
-    if (rsTo instanceof Error) return rsTo
-    if (rsFrom > date || rsTo < date) return false;
-    return true;
-};
-
-function matchRecievers(a, b, c){
-if(c ==! null){
-    for(var i in a){
-        if(a[i].match(new RegExp(b, "i")) && a[i].match(new RegExp(c, "i")))
-        return true;
-        else return false;
-    }
-}else{
-    for(var i in a){
-        if(a[i].match(new RegExp(b, "i")))
-        return true;
-        else return false;
-    }
-}
-}
-
-const action = (args, options, logger) => {
-    const emailList = new EmailList();
+const action = (args, opts, logger) => {
     const spinner = ora(InfoMsg.Loading).start();
+    const emailList = new EmailList();
 
     FileWalker(args.dir, (err, absPath, data) => {
-        if (err) return logger.error(chalk.red(ErrMsg.IO_FAILED_TO_READ(absPath)));
+        if (err) spinner.stop(), logger.error(chalk.red(ErrMsg.IO_FAILED_TO_READ(absPath))), process.exit(1);
 
         const emailParser = new EmailParser(data);
         const email = emailParser.parseAndCreateEmail();
-        
-        const rs = checkDateInRange(email, options);
-        if (rs instanceof Error) spinner.stop(), logger.error(chalk.red(rs.message)), process.exit(1);
-        else if (rs) Tab.push(email);
-    
+
+        const rsDate = checkDateRange(email, opts, options);
+        if (rsDate instanceof Error) spinner.stop(), logger.error(chalk.red(rsDate.message)), process.exit(1);
+        else if (!isUndefined(opts.name)) {
+            const rsName = checkEmployeeNameInOption(email, opts, options);
+            if (rsName instanceof Error) spinner.stop(), logger.error(chalk.red(rsName.message)), process.exit(1)
+            else if ((rsName === exchanged.SENT || rsName == exchanged.RECEIVED) && checkSubjectAndContent(email, opts))
+                emailList.push(email);
+        } else if(checkSubjectAndContent(email, opts))
+            emailList.push(email);
     }, () => {
-        
-        var tmp = [];
-        var sender = '';
-        var recievers = [];
-        var content = '';
-        
-
-        if(options.email){
-
-            for (var element in Tab){
-               
-                sender = Tab[element].sender;
-                recievers = Tab[element].receivers;
-
-                if(sender === options.param || (recievers.indexOf(options.param)) != -1 ){
-                tmp.push(Tab[element]);
-                emailList.push(Tab[element]);    
-            }
-             }
-             
-             spinner.stop();
-             process.stdout.write(emailList.toString());
-
-
-        }else if (options.name){
-            exp = options.param.split(' ')
-            exp1 = exp[0];
-            exp2 = exp[1];
-
-            for (var element in Tab){
-
-               sender = Tab[element].sender;
-               recievers = Tab[element].receivers;
-               content = Tab[element].content;
-
-                if(sender.match(new RegExp(exp1, "i")) && sender.match(new RegExp(exp2, "i"))||matchRecievers(recievers, exp1, exp2) || content.match(new RegExp(exp1, "i")) && content.match(new RegExp(exp2, "i"))){
-                    tmp.push(Tab[element]);
-                    emailList.push(Tab[element]);    
-
-                 }
-            }  
-            
-            spinner.stop();
-            process.stdout.write(emailList.toString());
-
-        }else if (options.word){
-
-            for (var element in Tab){
-
-            sender = Tab[element].sender;
-            recievers = Tab[element].receivers;
-            content = Tab[element].content;
-
-            if(sender.match(new RegExp(options.param, "i"))||matchRecievers(recievers, options.param, null) || content.match(new RegExp(options.param, "i"))){
-                
-                tmp.push(Tab[element]);
-                emailList.push(Tab[element]);
-            }
-        }
-        
         spinner.stop();
         process.stdout.write(emailList.toString());
-
-    }
     }, path => {
         spinner.stop();
         logger.error(chalk.red(ErrMsg.IO_PERMISSION_DENIED(path)));
     });
 
-}
-;
+};
 
 module.exports = {
     alias,
     command,
-    arguments,  
+    arguments,
     options,
     action
 };
