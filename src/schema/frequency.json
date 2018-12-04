@@ -9,8 +9,7 @@
    "encoding":{
       "size":{
          "type":"quantitative",
-         "aggregate":"sum",
-         "field":"email"
+         "aggregate":"count"
       },
       "x":{
          "type":"ordinal",
