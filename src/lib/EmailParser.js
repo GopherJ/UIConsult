@@ -4,7 +4,7 @@
  * @Author: Cheng JIANG 
  * @Date: 2018-11-27 22:31:10 
  * @Last Modified by: Cheng JIANG
- * @Last Modified time: 2018-12-05 21:58:59
+ * @Last Modified time: 2018-12-05 22:36:29
  */
 
 const Email = require('./Email');
@@ -50,6 +50,8 @@ class EmailParser {
 
         if (!isNull(matches))
             this._id = matches.slice(1).pop();
+        else
+            this._id = '';
 
         return this;
     }
@@ -83,6 +85,8 @@ class EmailParser {
 
         if (!isNull(matches))
             this._subject = matches.slice(1).pop();
+        else
+            this._subject = '';
 
         return this;
     }
@@ -93,6 +97,8 @@ class EmailParser {
 
         if (!isNull(matches))
             this._content = matches.slice(1).pop();
+        else
+            this._content = '';
 
         return this;
     }
@@ -103,6 +109,8 @@ class EmailParser {
         
         if (!isNull(matches))
             this._sender = matches.slice(1).pop();
+        else
+            this._sender = '';
 
         return this;
     }
@@ -113,7 +121,7 @@ class EmailParser {
         const hasReceivers = !isNull(matches);
 
         if (!hasReceivers)
-            this._isMigrated = true;
+            this._isMigrated = true, this._receivers = [];
         else
             this._receivers = matches[0].substring(4).split(/[^a-zA-Z-@\.]/g).filter(x => x);
 

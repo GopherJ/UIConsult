@@ -4,12 +4,11 @@
  * @Author: Cheng JIANG 
  * @Date: 2018-11-27 22:33:47 
  * @Last Modified by: Cheng JIANG
- * @Last Modified time: 2018-12-02 15:15:42
+ * @Last Modified time: 2018-12-05 22:31:12
  */
 
 const Email = require('./Email');
 const Table = require('./Table');
-
 const { formatDateHour } = require('../utils');
 
 class EmailList {
