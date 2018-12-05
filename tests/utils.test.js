@@ -3,7 +3,8 @@ const { expect } = require('chai');
 const {
     words,
     uniqueWords,
-    isOutsideWorkingHours } = require('../src/utils/index');
+    isOutsideWorkingHours 
+} = require('../src/utils/index');
 
 const txt = `Message-ID: <8229279.1075851877390.JavaMail.evans@thyme>\r
 Date: Tue, 11 Jan 2000 09:45:00 -0800 (PST)\r
@@ -23,14 +24,15 @@ X-bcc:\r
 X-Folder: \\Larry_Campbell_Nov2001_1\\Notes Folders\\2000 goals and objectives\r
 X-Origin: CAMPBELL-L\r
 X-FileName: lcampbe.nsf\r
-\r\n
-\r\n
+\r
+\r
 Rick, please please please see the attached files for the teams 2000 objectives`
 
 
 describe('test function utils', () => {
     const emailParser = new EmailParser(txt);
     const email = emailParser.parseAndCreateEmail();
+
     it('isOutsideWorkingHours', () => {
         expect(isOutsideWorkingHours(email.date)).to.be.equal(false);      
     });
@@ -38,7 +40,6 @@ describe('test function utils', () => {
         expect(uniqueWords(email.subject)).to.be.eqls(['Team','Meeting','Information']);
     });
     it('words' , () => {
-        console.log(words(email.content))
         expect(words(email.content)).to.be.eqls([ 'Rick', 'please','please','please','see','the','attached','files','for','the','teams','objectives' ]);
     });
 });
