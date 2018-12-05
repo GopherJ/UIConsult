@@ -30,21 +30,26 @@ exports.timeUnitMap = {
 };
 
 exports.vegaTimeUnits = [
-    "yearmonthdatehours",
-    "yearmonthdatehoursminutes",
-    "yearmonthdatehoursminutesseconds",
-    "quarter",
-    "quartermonth",
-    "month",
-    "monthdate",
-    "date",
-    "day",
-    "hours",
-    "hoursminutes",
-    "hoursminutesseconds",
-    "minutes",
-    "minutesseconds",
-    "seconds",
-    "secondsmilliseconds",
-    "milliseconds"
+    'yearmonthdatehours',
+    'yearmonthdatehoursminutes',
+    'yearmonthdatehoursminutesseconds',
+    'quarter',
+    'quartermonth',
+    'month',
+    'monthdate',
+    'date',
+    'day',
+    'hours',
+    'hoursminutes',
+    'hoursminutesseconds',
+    'minutes',
+    'minutesseconds',
+    'seconds',
+    'secondsmilliseconds',
+    'milliseconds'
 ];
+
+exports.EXTENSION = {
+    SVG: '.svg',
+    PNG: '.png'
+};
