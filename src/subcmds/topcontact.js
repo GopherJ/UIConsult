@@ -95,7 +95,7 @@ const action = (args, opts, logger) => {
             // stop spinner, log error, exit process
             spinner.stop(), logger.error(chalk.red(rsEmployee.message)), process.exit(1);
         // no error
-        else {
+        else if (rsDate) {
             switch(rsEmployee) {
             // Map {email_addr => {sent: a, recv: b, exchanged: c}}
             case SENT:

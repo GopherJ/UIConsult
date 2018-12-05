@@ -74,12 +74,14 @@ const action = (args, opts, logger) => {
 
         const rsDate = checkDateRange(email, opts, options);
         if (rsDate instanceof Error) spinner.stop(), logger.error(chalk.red(rsDate.message)), process.exit(1);
+        else if (!rsDate) return;
         else if (!isUndefined(opts.name)) {
             const rsName = checkEmployeeNameInOption(email, opts, options);
             if (rsName instanceof Error) spinner.stop(), logger.error(chalk.red(rsName.message)), process.exit(1)
             else if ((rsName === exchanged.SENT || rsName == exchanged.RECEIVED) && checkSubjectAndContent(email, opts))
                 emailList.push(email);
-        } else if(checkSubjectAndContent(email, opts))
+        } 
+        else if(checkSubjectAndContent(email, opts))
             emailList.push(email);
     }, () => {
         spinner.stop();

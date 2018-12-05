@@ -68,7 +68,7 @@ const action = (args, opts, logger) => {
         const rsDate = checkDateRange(email, opts, options);
 
         if (rsDate instanceof Error) spinner.stop(), logger.error(chalk.red(rsDate.message)), process.exit(1);
-        else m.has(email.sender) ? m.set(email.sender, m.get(email.sender) + 1) : m.set(email.sender, 1);
+        else if (rsDate) m.has(email.sender) ? m.set(email.sender, m.get(email.sender) + 1) : m.set(email.sender, 1);
     }, () => {
         spinner.stop();
 

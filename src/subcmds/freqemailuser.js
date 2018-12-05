@@ -80,7 +80,7 @@ const action = (args, opts, logger) => {
         const rsEmployee = checkEmpolyeeNameInOption(email, opts, options);
         if (rsDate instanceof Error) spinner.stop(), logger.error(chalk.red(rsDate.message)), process.exit(1);
         else if(rsEmployee instanceof Error) spinner.stop(), logger.error(chalk.red(rsDate.message)), process.exit(1);
-        else if (rsEmployee === SENT) circles.push({ date: email.date.valueOf() });
+        else if (rsDate && rsEmployee === SENT) circles.push({ date: email.date.valueOf() });
     }, () => {
         spinner.stop();
         schema['data']['values'] = circles;

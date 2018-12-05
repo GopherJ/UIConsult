@@ -65,6 +65,10 @@ const options = {
 };
 
 const action = (args, opts, logger) => {
+    if (!vegaTimeUnits.includes(opts.frequency))
+        spinner.stop(), logger.error(chalk.red(ErrMsg.OPTION_INVALID_FORMAT(options.frequency.var))), process.exit(1);
+    else updateTimeUnit(schema, opts.frequency);
+
     // start the spinner
     const spinner = ora(InfoMsg.Loading).start();
 
@@ -96,12 +100,7 @@ const action = (args, opts, logger) => {
             // stop spinner, log error, exit process
             spinner.stop(), logger.error(chalk.red(rsEmployee.message)), process.exit(1);
         // no error
-        else if (!vegaTimeUnits.includes(opts.frequency)) {
-            spinner.stop(), logger.error(chalk.red(ErrMsg.OPTION_INVALID_FORMAT(options.frequency.var))), process.exit(1);
-        }
-        else {
-            updateTimeUnit(schema, opts.frequency);
-
+        else if (rsDate) {
             switch(rsEmployee) {
             case SENT:
                 exchangedEmails.push({
