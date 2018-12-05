@@ -5,7 +5,7 @@
     "main": "src/index.js",
     "scripts": {
         "build": "cd scripts && node build.js",
-        "test": "cd tests && ../node_modules/.bin/mocha ./**/*.js"
+        "test": "mocha tests/**/*.js"
     },
     "keywords": [],
     "author": "Cheng JIANG",
