@@ -5,7 +5,18 @@ const txt = `Message-ID: <8229279.1075851877390.JavaMail.evans@thyme>\r
 Date: Tue, 11 Jan 2000 09:45:00 -0800 (PST)\r
 From: mike.riedel@enron.com\r
 To: rick.cates@enron.com, butch.russell@enron.com, leo.nichols@enron.com,\r
+    rick.loveless@enron.com, ron.harkrader@enron.com,\r
+    ron.beidelman@enron.com, larry.campbell@enron.com,\r
+    william.kendrick@enron.com\r
 Subject: Team Meeting Information\r
+Cc: rick.cates@enron.com, butch.russell@enron.com, leo.nichols@enron.com,\r
+    rick.loveless@enron.com, ron.harkrader@enron.com,\r
+    ron.beidelman@enron.com, larry.campbell@enron.com,\r
+    william.kendrick@enron.com\r
+Bcc: rick.cates@enron.com, butch.russell@enron.com, leo.nichols@enron.com,\r
+    rick.loveless@enron.com, ron.harkrader@enron.com,\r
+    ron.beidelman@enron.com, larry.campbell@enron.com,\r
+    william.kendrick@enron.com\r
 Mime-Version: 1.0\r
 Content-Type: text/plain; charset=us-ascii\r
 Content-Transfer-Encoding: 7bit\r
@@ -34,6 +45,45 @@ describe('EmailParser test', () => {
 
     it('Sender', () => {
         expect(email.sender).to.be.equal('mike.riedel@enron.com');
+    });
+
+    it('Receivers', () => {
+        expect(email.receivers).to.deep.equal([
+            'rick.cates@enron.com', 
+            'butch.russell@enron.com', 
+            'leo.nichols@enron.com',
+            'rick.loveless@enron.com',
+            'ron.harkrader@enron.com',
+            'ron.beidelman@enron.com',
+            'larry.campbell@enron.com',
+            'william.kendrick@enron.com'
+        ]);
+    });
+
+    it('CcReceivers', () => {
+        expect(email.ccreceivers).to.deep.equal([
+            'rick.cates@enron.com', 
+            'butch.russell@enron.com', 
+            'leo.nichols@enron.com',
+            'rick.loveless@enron.com',
+            'ron.harkrader@enron.com',
+            'ron.beidelman@enron.com',
+            'larry.campbell@enron.com',
+            'william.kendrick@enron.com'
+        ]);
+    });
+
+    it('BccReceivers', () => {
+        expect(email.bccreceivers).to.deep.equal([
+            'rick.cates@enron.com', 
+            'butch.russell@enron.com', 
+            'leo.nichols@enron.com',
+            'rick.loveless@enron.com',
+            'ron.harkrader@enron.com',
+            'ron.beidelman@enron.com',
+            'larry.campbell@enron.com',
+            'william.kendrick@enron.com'
+        ]);
     });
 
     it('Content', () => {

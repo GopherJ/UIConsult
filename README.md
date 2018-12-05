@@ -1,81 +1,65 @@
 ## UIConsult
 
-GL02 project starter
+GL02 project@1.0
 
+### System Dependencies
 
-### IDE
+```bash
+sudo apt install libcairo2-dev libjpeg-dev libgif-dev
+```
 
-- `vscode`
-- `webstorm`
+### API
 
+```
+index.js 0.1.0
 
-### Development
+USAGE
 
-- `install npm or yarn (yarn is better), nvm`
-- `nvm use`
-- `fork this project`
-- `git clone https://github.com/youraccount/UIConsult && cd UIConsult`
-- `yarn OR npm install`
-- `develop and commit`
-- `push to your own repo`
-- `send PR to this repo`
+  index.js <command> [options]
 
+COMMANDS
 
-### Dependencies
+  searchbycriteria <dir>             Email research per criteria
+  freqemailuser <dir>                Access the frequency of a user’s sent emails on a period of time
+  nbemailscolab <dir>                Display the number of emails sent from all the collaborators on a daily or a monthly basis
+  loademails <dir>                   Load emails of specific period
+  nbemails <dir> <employee>          Show an employee's exchanged emails' statistics of specific period
+  busydays <dir> <employee>          Displays the list of the 10 days selected and the number of emails sent (outside working hours) for these days.
+  topcontact <dir> <employee>        Show an employee's exchanged emails' statistics of specific period
+  topwords <dir> <employee>          Displays the list of the 10 most used words in the emails subjects followed with the number and percentageof mail each word appears in
+  exchangeplot <dir> <employee>      Have a visual representation of the employee interactions.
+  help <command>                     Display help for a specific command
 
-Learn these cool packages so that you can use it in this project
+GLOBAL OPTIONS
 
-- `commander`
-- `table`
-- `vega, vega-lite, vega-embed`
-- `walkdir`
-
-And you need also to learn `mocha` and `chai` so that you can write unit test
-
-
-### Caveats
-
-1. Don't develop on windows, if you must, please download `dos2unix` on sf and execute on every file
-
-2. You need to write unit test for most functions you've added
-
-3. By default we will use ES6 and babel, so you need to use `import` and `export` to replace `require`
-
-4. Install `editorconfig` plugin for your IDE to make sure that we have a common basic code format
-
-5. `vega` requires `libcairo2-dev` `libjpeg-dev` `libgif-dev` installed, you need to install them by yourself. On ubuntu, you can install them bu running:
-
-    ```bash
-    sudo apt install libcairo2-dev libjpeg-dev libgif-dev
-    ```
-
-
-### Current API
-
-The executable will be named as `uic`.
-
-1. `uic --help, -h`                               :           display help information
-2. `uic --version, -V`                            :           display version
-3. `uic --date-from, --date-to, -s, -e`           :           specify period of time. e.g. '-s="2018"'
-4.
-....
-
-
+  -h, --help         Display help
+  -V, --version      Display version
+  --no-color         Disable colors
+  --quiet            Quiet mode - only displays warn and error messages
+  -v, --verbose      Verbose mode - will also output debug messages
+```
 
 ### Build && Compile && Test
 
-`compile to generate an executable`
+`compile`
 
 ```bash
 npm run build
 # it will generate executables for linux, win and  macos. See the executable in ./bin
 ```
 
+`cross-system compile`
+
+```bash
+TARGET_OS=win npm run build
+TARGET_OS=linux npm run build
+TARGET_OS=osx npm run build
+```
+
 `unit test`
 
 ```bash
 npm run test
-# now there is no test
 ```
 
 

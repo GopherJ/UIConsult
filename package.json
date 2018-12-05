@@ -9,13 +9,6 @@
     },
     "keywords": [],
     "author": "Cheng JIANG",
-    "Contributors": [
-        {
-            "name": "Cheng JIANG",
-            "email": "cocathecafe@gmail.com",
-            "url": "https://github.com/gopherj"
-        }
-    ],
     "license": "MIT",
     "devDependencies": {
         "chai": "^4.2.0",

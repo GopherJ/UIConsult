@@ -4,7 +4,7 @@
  * @Author: Cheng JIANG 
  * @Date: 2018-11-27 22:31:10 
  * @Last Modified by: Cheng JIANG
- * @Last Modified time: 2018-12-05 17:07:27
+ * @Last Modified time: 2018-12-05 21:58:59
  */
 
 const Email = require('./Email');
@@ -108,46 +108,40 @@ class EmailParser {
     }
 
     parseReceivers() {
-        // ToDo: this is not a good and effecient regexp
-        const re = /(?:To: ?)((?:(?:[^<>()\[\]\\.,;:\s@"]+(?:\.[^<>()\[\]\\.,;:\s@"]+)*)|(?:".+"))@(?:(?:\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(?:(?:[a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))[,\t\n ]*)*/;
+        const re = /To: ((([^<>()\[\]\.,;:\s@\"]+(\.[^<>()\[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})((,\s*)|(,\s*\r\n\s*)|()))*\r\n/;
         const matches = this._mailText.match(re);
-        const hasReceivers = matches !== null;
+        const hasReceivers = !isNull(matches);
 
-        if (!hasReceivers) {
+        if (!hasReceivers)
             this._isMigrated = true;
-        } else {
-            this._receivers = matches[0].split(',').map(x => x.replace(/(\s|\n)+/, '')).map(x => x.replace(/^To:/, '')).map(x => x.replace(/\n/, '')).filter(x => x);
-        }
+        else
+            this._receivers = matches[0].substring(4).split(/[^a-zA-Z-@\.]/g).filter(x => x);
 
         return this;
     }
 
     parseCcReceivers() {
-        // ToDo: this is not a good and effecient regexp
-        const re = /(?:Cc: ?)((?:(?:[^<>()\[\]\\.,;:\s@"]+(?:\.[^<>()\[\]\\.,;:\s@"]+)*)|(?:".+"))@(?:(?:\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(?:(?:[a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))[,\t\n ]*)*/;
+        const re = /Cc: ((([^<>()\[\]\.,;:\s@\"]+(\.[^<>()\[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})((,\s*)|(,\s*\r\n\s*)|()))*\r\n/;
         const matches = this._mailText.match(re);
-        const hasCcReceivers = matches !== null;
+        const hasCcReceivers = !isNull(matches);
 
-        if (!hasCcReceivers) {
+        if (!hasCcReceivers)
             this._ccreceivers = [];
-        } else {
-            this._ccreceivers = matches[0].split(',').map(x => x.replace(/(\s|\n)+/, '')).map(x => x.replace(/^Cc:/, '')).map(x => x.replace(/\n/, '')).filter(x => x);
-        }
+        else
+            this._ccreceivers = matches[0].substring(4).split(/[^a-zA-Z-@\.]/g).filter(x => x);
 
         return this;
     }
 
     parseBccReceivers() {
-        // ToDo: this is not a good and effecient regexp
-        const re = /(?:Bcc: ?)((?:(?:[^<>()\[\]\\.,;:\s@"]+(?:\.[^<>()\[\]\\.,;:\s@"]+)*)|(?:".+"))@(?:(?:\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(?:(?:[a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))[,\t\n ]*)*/;
+        const re = /Bcc: ((([^<>()\[\]\.,;:\s@\"]+(\.[^<>()\[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})((,\s*)|(,\s*\r\n\s*)|()))*\r\n/;
         const matches = this._mailText.match(re);
-        const hasBccReceivers = matches !== null;
+        const hasBccReceivers = !isNull(matches);
 
-        if (!hasBccReceivers) {
+        if (!hasBccReceivers)
             this._bccreceivers = [];
-        } else {
-            this._bccreceivers = matches[0].split(',').map(x => x.replace(/(\s|\n)+/, '')).map(x => x.replace(/^Bcc:/, '')).map(x => x.replace(/\n/, '')).filter(x => x);
-        }
+        else
+            this._bccreceivers = matches[0].substring(5).split(/[^a-zA-Z-@\.]/g).filter(x => x);
 
         return this;
     }

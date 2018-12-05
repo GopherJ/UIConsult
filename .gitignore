@@ -8,9 +8,6 @@ yarn-error.log*
 # dist
 dist/
 
-# data
-data/
-
 # Jetbrains
 .idea/
 
@@ -89,3 +86,10 @@ typings/
 
 # donneesSujetB
 donneesSujetB/
+
+# data
+data/
+
+# executable
+bin/
+

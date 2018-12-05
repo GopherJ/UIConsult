@@ -29,7 +29,7 @@ X-FileName: lcampbe.nsf\r
 Rick, please please please see the attached files for the teams 2000 objectives`
 
 
-describe('test function utils', () => {
+describe('Utils test', () => {
     const emailParser = new EmailParser(txt);
     const email = emailParser.parseAndCreateEmail();
 
