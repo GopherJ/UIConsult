@@ -4,12 +4,12 @@
  * @Author: Cheng JIANG 
  * @Date: 2018-11-27 22:31:10 
  * @Last Modified by: Cheng JIANG
- * @Last Modified time: 2018-11-27 22:32:51
+ * @Last Modified time: 2018-12-04 16:32:29
  */
 
 const Email = require('./Email');
-
 const { isNull } = require('../utils');
+const { monthsMap } = require('../utils/constants');
 
 /**
  * Email Parser
@@ -55,21 +55,6 @@ class EmailParser {
     }
 
     parseDate() {
-        const monthsMap = {
-            'Jan': 1,
-            'Feb': 2,
-            'Mar': 3,
-            'Apr': 4,
-            'May': 5,
-            'Jun': 6,
-            'Jul': 7,
-            'Aug': 8,
-            'Sep': 9,
-            'Oct': 10,
-            'Nov': 11,
-            'Dec': 12
-        };
-
         const re = /^Date: ?(?:Mon|Tue|Wed|Thu|Fri|Sat|Sun), ([0-9]{1,2}) (Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec) ([0-9]{4}) ([0-9]{2}):([0-9]{2}):([0-9]{2})/m;
         const matches = this._mailText.match(re);
 
