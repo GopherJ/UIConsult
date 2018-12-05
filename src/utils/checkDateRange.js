@@ -109,6 +109,16 @@ const checkDateRange = (email, opts, options) => {
         // email's date is out of range
         if(rs < date) return false;
         return true;
+    } else {
+        const rsDateTo = parseDate(dateTo, false, options);
+        const rsDateFrom = parseDate(dateFrom, true, options);
+
+        // parsing error
+        if (rsDateFrom instanceof Error) return rsDateFrom;
+        else if (rsDateTo instanceof Error) return rsDateTo;
+        else if (rsDateFrom > rsDateTo) return new Error(ErrMsg.OPTION_FROM_TO(options.dateFrom.var, options.dateTo.var))
+        else if (date < rsDateTo && date > rsDateFrom) return true;
+        return false;
     }
 
     // start date and end date are all specified

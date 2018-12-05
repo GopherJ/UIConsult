@@ -4,7 +4,7 @@
  * @Author: Cheng JIANG 
  * @Date: 2018-11-27 22:31:10 
  * @Last Modified by: Cheng JIANG
- * @Last Modified time: 2018-12-04 16:32:29
+ * @Last Modified time: 2018-12-05 14:46:16
  */
 
 const Email = require('./Email');
@@ -45,7 +45,7 @@ class EmailParser {
     }
 
     parseId() {
-        const re = /^Message-ID: ?<(.*)>/m;
+        const re = /^Message-ID: ?<([^\r]*)>/m;
         const matches = this._mailText.match(re);
 
         if (!isNull(matches))
@@ -78,7 +78,7 @@ class EmailParser {
     }
 
     parseSubject() {
-        const re = /^Subject: ?(.*)/m;
+        const re = /^Subject: ?([^\r]*)/m;
         const matches = this._mailText.match(re);
 
         if (!isNull(matches))
@@ -88,7 +88,7 @@ class EmailParser {
     }
 
     parseContent() {
-        const re = /[\s\S]*\n\n([\s\S]*)/;
+        const re = /[\s\S]*\r\n\r\n([\s\S]*)/;
         const matches = this._mailText.match(re);
 
         if (!isNull(matches))
@@ -98,7 +98,7 @@ class EmailParser {
     }
 
     parseSender() {
-        const re = /^From: ?(.*)/m;
+        const re = /^From: ?([^\r]*)/m;
         const matches = this._mailText.match(re);
         
         if (!isNull(matches))
@@ -116,7 +116,7 @@ class EmailParser {
         if (!hasReceivers) {
             this._isMigrated = true;
         } else {
-            this._receivers = matches[0].split(',').map(x => x.replace(/(\s|\n)+/, '')).map(x => x.replace(/^To:/, '')).map(x => x.replace(/\n/, ''));
+            this._receivers = matches[0].split(',').map(x => x.replace(/(\s|\n)+/, '')).map(x => x.replace(/^To:/, '')).map(x => x.replace(/\n/, '')).filter(x => x);
         }
 
         return this;
@@ -131,7 +131,7 @@ class EmailParser {
         if (!hasCcReceivers) {
             this._ccreceivers = [];
         } else {
-            this._ccreceivers = matches[0].split(',').map(x => x.replace(/(\s|\n)+/, '')).map(x => x.replace(/^Cc:/, '')).map(x => x.replace(/\n/, ''));
+            this._ccreceivers = matches[0].split(',').map(x => x.replace(/(\s|\n)+/, '')).map(x => x.replace(/^Cc:/, '')).map(x => x.replace(/\n/, '')).filter(x => x);
         }
 
         return this;
@@ -146,7 +146,7 @@ class EmailParser {
         if (!hasBccReceivers) {
             this._bccreceivers = [];
         } else {
-            this._bccreceivers = matches[0].split(',').map(x => x.replace(/(\s|\n)+/, '')).map(x => x.replace(/^Bcc:/, '')).map(x => x.replace(/\n/, ''));
+            this._bccreceivers = matches[0].split(',').map(x => x.replace(/(\s|\n)+/, '')).map(x => x.replace(/^Bcc:/, '')).map(x => x.replace(/\n/, '')).filter(x => x);
         }
 
         return this;
