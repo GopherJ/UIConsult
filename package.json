@@ -30,7 +30,7 @@
     },
     "pkg": {
         "assets": [
-            "views/**/*"
+            "src/views/**/*"
         ]
     }
 }

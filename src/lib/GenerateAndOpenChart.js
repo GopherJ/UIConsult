@@ -23,21 +23,19 @@ const GenerateAndOpenChart = (schema, filePath) => {
             const runtime = vg.parse(chart);
             const view = new vg.View(runtime).renderer('none').initialize();
 
-            switch (ext) {
-            case SVG: 
-                view.toSVG().then(data => {
-                    fs.writeFileSync(filePath, data);
-                    view.finalize();
-                    Open(filePath);
-                });
-            case PNG:
-                view.toCanvas().then(canvas => {
-                    const out = fs.createWriteStream(filePath);
-                    const stream = canvas.createPNGStream();
-                    stream.pipe(out);
-                    out.on('finish', () => Open(filePath));
-                });
-            }
+        if (ext === SVG)
+            view.toSVG().then(data => {
+                fs.writeFileSync(filePath, data);
+                view.finalize();
+                Open(filePath);
+            });
+        else if (ext === PNG)
+            view.toCanvas().then(canvas => {
+                const out = fs.createWriteStream(filePath);
+                const stream = canvas.createPNGStream();
+                stream.pipe(out);
+                out.on('finish', () => Open(filePath));
+            });
         }
     });
 };
